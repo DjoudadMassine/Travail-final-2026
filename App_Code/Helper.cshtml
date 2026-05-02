@@ -148,7 +148,7 @@
 }
 @helper CountryFlag(string countryCode)
 {
-    var country = PhotosManager.WebServices.Countries.Get(countryCode);
+    var country = WebServices.Countries.Get(countryCode);
     if (country != null)
     {
         <img src="@country.Flag" title="@country.Name" style="width:40px;" />

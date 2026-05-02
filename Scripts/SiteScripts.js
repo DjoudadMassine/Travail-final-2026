@@ -56,6 +56,32 @@ function SummaryHandling() {
         }
     })
 }
+function RestoreDetailsState() {
+    //////////////////////////////////////////////////////////
+    /// Install event handler
+    //////////////////////////////////////////////////////////
+    $("details").off();
+    $("details").on('toggle', function () {
+        let details_dom = $(this)[0];
+        if (details_dom != undefined) {
+            // Save details state
+            localStorage.setItem(details_dom.id, details_dom.open);
+        }
+    })
+    
+    // Restore state of each details tags
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        // target only keys that contain "details" string
+        if (key.indexOf("details") > -1) {
+            let details_dom = $("#" + key)[0];
+            if (details_dom != undefined)
+                // all values in localstorage are stored as string
+                details_dom.open = localStorage.getItem(key) == "true";
+            let i = 0;
+        }
+    }
+}
 
 $(".submitCmd").click(function () {
     $("form").submit();
@@ -120,3 +146,24 @@ function ajaxActionCall(actionLink) {
     });
 }
 
+let minKeywordLenth = 1;
+function highlight(text, elem) {
+    text = text.trim();
+    if (text.length >= minKeywordLenth) {
+        var innerHTML = elem.innerHTML;
+        let startIndex = 0;
+
+        while (startIndex < innerHTML.length) {
+            var normalizedHtml = innerHTML.toLocaleLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            var index = normalizedHtml.indexOf(text, startIndex);
+            let highLightedText = "";
+            if (index >= startIndex) {
+                highLightedText = "<span class='highlight'>" + innerHTML.substring(index, index + text.length) + "</span>";
+                innerHTML = innerHTML.substring(0, index) + highLightedText + innerHTML.substring(index + text.length);
+                startIndex = index + highLightedText.length + 1;
+            } else
+                startIndex = innerHTML.length + 1;
+        }
+        elem.innerHTML = innerHTML;
+    }
+}

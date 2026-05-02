@@ -161,6 +161,8 @@
     <Content Include="App_Assets\Users\a85fbd9a-5340-4053-a4c5-c7d491df7afe.jpeg" />
     <Content Include="App_Assets\Users\no_avatar.png" />
     <Content Include="App_Data\iso-3166.txt" />
+    <Content Include="bin\LionelGroulx.dll" />
+    <Content Include="bin\LionelGroulx.pdb" />
     <Content Include="bin\Newtonsoft.Json.dll" />
     <Content Include="Content\Accounts.css" />
     <Content Include="Content\Icons.css" />
@@ -232,7 +234,7 @@
     <Content Include="App_Data\Users.json" />
     <Content Include="App_Data\UsersAzure.json" />
     <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
-    <Content Include="obj\Debug\Wikimedia.csproj.AssemblyReference.cache" />
+    <Content Include="obj\Debug\LionelGroux.csproj.AssemblyReference.cache" />
     <None Include="packages.config" />
     <Content Include="Views\Shared\_header.cshtml" />
     <Content Include="Views\Accounts\Login.cshtml" />
