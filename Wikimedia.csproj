@@ -142,11 +142,26 @@
     <Compile Include="Models\RenewPasswordView.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\UsersRepository.cs" />
+    <Compile Include="obj\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebServices\Countries.cs" />
     <Compile Include="WebServices\GeoLocation.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include=".gitattributes" />
+    <Content Include=".gitignore" />
+    <Content Include="App_Assets\Users\13070465-e361-4d69-9073-06ebeb3c64ad.jpeg" />
+    <Content Include="App_Assets\Users\156ab756-729a-4dc9-ae1d-cdda8ccfd00d.jpeg" />
+    <Content Include="App_Assets\Users\32705cf0-2e95-4362-bce7-7d77cb8d4b84.jpeg" />
+    <Content Include="App_Assets\Users\3b8cc315-9869-4eeb-acb0-9f539b33758a.jpeg" />
+    <Content Include="App_Assets\Users\3b8cc315-9869-4eeb-acb0-9f539b33758aX.jpeg" />
+    <Content Include="App_Assets\Users\42c2ab89-8bff-457f-9592-0e2321b08511.jpeg" />
+    <Content Include="App_Assets\Users\67e02a94-2b82-4d76-8396-9cac4db7308d.png" />
+    <Content Include="App_Assets\Users\8b12ca6f-f732-440c-b7db-ccb07e1fdcae.png" />
+    <Content Include="App_Assets\Users\a85fbd9a-5340-4053-a4c5-c7d491df7afe.jpeg" />
+    <Content Include="App_Assets\Users\no_avatar.png" />
+    <Content Include="App_Data\iso-3166.txt" />
+    <Content Include="bin\Newtonsoft.Json.dll" />
     <Content Include="Content\Accounts.css" />
     <Content Include="Content\Icons.css" />
     <Content Include="Content\image-control.css" />
@@ -199,9 +214,25 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="WebApp.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="obj\Debug\TempPE\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Helper.cshtml" />
+    <Content Include="App_Data\Commentlikes.json" />
+    <Content Include="App_Data\Comments.json" />
+    <Content Include="App_Data\Events.json" />
+    <Content Include="App_Data\Likes.json" />
+    <Content Include="App_Data\Logins.json" />
+    <Content Include="App_Data\Medias.json" />
+    <Content Include="App_Data\MediasAzure.json" />
+    <Content Include="App_Data\Notifications.json" />
+    <Content Include="App_Data\RenewPasswordCommands.json" />
+    <Content Include="App_Data\UnverifiedEmails.json" />
+    <Content Include="App_Data\Users.json" />
+    <Content Include="App_Data\UsersAzure.json" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <Content Include="obj\Debug\Wikimedia.csproj.AssemblyReference.cache" />
     <None Include="packages.config" />
     <Content Include="Views\Shared\_header.cshtml" />
     <Content Include="Views\Accounts\Login.cshtml" />
