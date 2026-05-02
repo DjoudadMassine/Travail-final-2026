@@ -123,25 +123,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Models\Comment.cs" />
-    <Compile Include="Models\CommentsRepository.cs" />
-    <Compile Include="Models\EmailView.cs" />
-    <Compile Include="Models\Event.cs" />
-    <Compile Include="Models\EventsRepository.cs" />
-    <Compile Include="Models\Commentlike.cs" />
-    <Compile Include="Models\Like.cs" />
-    <Compile Include="Models\CommentLikesRepository.cs" />
-    <Compile Include="Models\LikesRepository.cs" />
-    <Compile Include="Models\Login.cs" />
-    <Compile Include="Models\LoginCredential.cs" />
-    <Compile Include="Models\LoginsRepository.cs" />
-    <Compile Include="Models\MediasRepository.cs" />
-    <Compile Include="Models\Media.cs" />
-    <Compile Include="Models\Notification.cs" />
-    <Compile Include="Models\NotificationsRepository.cs" />
-    <Compile Include="Models\RenewPasswordView.cs" />
-    <Compile Include="Models\User.cs" />
-    <Compile Include="Models\UsersRepository.cs" />
+    <Compile Include="Models\SelectListUtilities.cs" />
     <Compile Include="obj\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebServices\Countries.cs" />
@@ -150,6 +132,13 @@
   <ItemGroup>
     <Content Include=".gitattributes" />
     <Content Include=".gitignore" />
+    <Content Include="App_Assets\teachers\bc2be815-cd3d-459d-a312-49e60229c80c.jpeg" />
+    <Content Include="App_Assets\teachers\c00b3008-a41a-4586-a338-1a589256b1bd.jpeg" />
+    <Content Include="App_Assets\teachers\c7a24783-6cbd-4583-a094-a72f2ac2e389.jpeg" />
+    <Content Include="App_Assets\teachers\f4e08e66-6485-4c73-b1f8-52edae4f497a.jpeg" />
+    <Content Include="App_Assets\teachers\f9a42fd9-87e4-41d6-87c6-50fa3526db49.jpeg" />
+    <Content Include="App_Assets\teachers\fbb51b24-2763-4d30-b175-6a78856ade4b.jpeg" />
+    <Content Include="App_Assets\teachers\no_avatar.png" />
     <Content Include="App_Assets\Users\13070465-e361-4d69-9073-06ebeb3c64ad.jpeg" />
     <Content Include="App_Assets\Users\156ab756-729a-4dc9-ae1d-cdda8ccfd00d.jpeg" />
     <Content Include="App_Assets\Users\32705cf0-2e95-4362-bce7-7d77cb8d4b84.jpeg" />
@@ -160,35 +149,32 @@
     <Content Include="App_Assets\Users\8b12ca6f-f732-440c-b7db-ccb07e1fdcae.png" />
     <Content Include="App_Assets\Users\a85fbd9a-5340-4053-a4c5-c7d491df7afe.jpeg" />
     <Content Include="App_Assets\Users\no_avatar.png" />
-    <Content Include="App_Data\iso-3166.txt" />
     <Content Include="bin\LionelGroulx.dll" />
     <Content Include="bin\LionelGroulx.pdb" />
     <Content Include="bin\Newtonsoft.Json.dll" />
-    <Content Include="Content\Accounts.css" />
     <Content Include="Content\Icons.css" />
     <Content Include="Content\image-control.css" />
     <Content Include="Content\jqui-custom-datepicker.css" />
-    <Content Include="Content\media.css" />
     <Content Include="Content\menu.css" />
     <Content Include="Content\popup.css" />
     <Content Include="Content\Selections.css" />
     <Content Include="Content\site.css" />
-    <Content Include="Content\UI-Images\Abort.png" />
-    <Content Include="Content\UI-Images\Accept.png" />
-    <Content Include="Content\UI-Images\admin.png" />
-    <Content Include="Content\UI-Images\Loading_icon.gif" />
-    <Content Include="Content\UI-Images\Masked.png" />
-    <Content Include="Content\UI-Images\na.png" />
-    <Content Include="Content\UI-Images\OffLine.png" />
-    <Content Include="Content\UI-Images\OnLine.png" />
-    <Content Include="Content\UI-Images\PhotoCloudLogo.png" />
-    <Content Include="Content\UI-Images\power_user.png" />
-    <Content Include="Content\UI-Images\shared.png" />
-    <Content Include="Content\UI-Images\timeout.png" />
-    <Content Include="Content\UI-Images\user.png" />
     <Content Include="Content\_layout.css" />
     <Content Include="favicon.ico" />
     <Content Include="Global.asax" />
+    <Content Include="Models\UI-Images\Abort.png" />
+    <Content Include="Models\UI-Images\Accept.png" />
+    <Content Include="Models\UI-Images\admin.png" />
+    <Content Include="Models\UI-Images\Loading_icon.gif" />
+    <Content Include="Models\UI-Images\Masked.png" />
+    <Content Include="Models\UI-Images\na.png" />
+    <Content Include="Models\UI-Images\OffLine.png" />
+    <Content Include="Models\UI-Images\OnLine.png" />
+    <Content Include="Models\UI-Images\PhotoCloudLogo.png" />
+    <Content Include="Models\UI-Images\power_user.png" />
+    <Content Include="Models\UI-Images\shared.png" />
+    <Content Include="Models\UI-Images\timeout.png" />
+    <Content Include="Models\UI-Images\user.png" />
     <Content Include="Scripts\autoRefreshPanel.js" />
     <Content Include="Scripts\bootbox.js" />
     <Content Include="Scripts\image-control.js" />
@@ -217,22 +203,11 @@
     <Content Include="WebApp.png" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="App_Data\" />
     <Folder Include="obj\Debug\TempPE\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Helper.cshtml" />
-    <Content Include="App_Data\Commentlikes.json" />
-    <Content Include="App_Data\Comments.json" />
-    <Content Include="App_Data\Events.json" />
-    <Content Include="App_Data\Likes.json" />
-    <Content Include="App_Data\Logins.json" />
-    <Content Include="App_Data\Medias.json" />
-    <Content Include="App_Data\MediasAzure.json" />
-    <Content Include="App_Data\Notifications.json" />
-    <Content Include="App_Data\RenewPasswordCommands.json" />
-    <Content Include="App_Data\UnverifiedEmails.json" />
-    <Content Include="App_Data\Users.json" />
-    <Content Include="App_Data\UsersAzure.json" />
     <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
     <Content Include="obj\Debug\LionelGroux.csproj.AssemblyReference.cache" />
     <None Include="packages.config" />
