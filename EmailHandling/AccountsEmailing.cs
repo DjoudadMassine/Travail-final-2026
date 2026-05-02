@@ -45,7 +45,7 @@ namespace EmailHandling
 
     public static class AccountsEmailing
     {
-        const string ApplicationName = "Wikimedia";
+        const string ApplicationName = "LionelGroulx";
 
         public static string GetServerDomaine()
         {

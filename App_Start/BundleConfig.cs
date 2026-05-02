@@ -1,6 +1,6 @@
 ﻿using System.Web.Optimization;
 
-namespace Wikimedia
+namespace LionelGroulx
 {
     public class BundleConfig
     {
