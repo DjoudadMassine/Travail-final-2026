@@ -1,0 +1,50 @@
+﻿@model IEnumerable<Models.Media>
+
+@{
+    if (Model.Count() != 0)
+    {
+        int connectedId = Models.User.ConnectedUser.Id;
+        foreach (var media in Model)
+        {
+            bool writeAccess = Models.User.ConnectedUser.IsAdmin || media.OwnerId == connectedId;
+            bool userLike = DAL.DB.Likes.ToList().Exists(l => (l.MediaId == media.Id && l.UserId == connectedId));
+            bool userComment = DAL.DB.Comments.ToList().Exists(l => (l.MediaId == media.Id && l.OwnerId == connectedId));
+            string mediaLikedByConnectedUser = userLike ? "fa" : "fa-regular";
+            string mediaCommentByConnectedUser = userComment ? "fa-solid" : "fa-regular";
+
+            <div class="mediaLayout">
+                <a href="/Medias/Details/@media.Id" title="Voir les détails de @media.Title" style="text-decoration:none; width:100% !important">
+                    <div class="mediaThumbnail"
+                         style="background-image:url('https://img.youtube.com/vi/@media.YoutubeId/mqdefault.jpg'); padding:6px; display:flex; flex-flow:row-reverse ">
+                        <div class="UserSmallAvatar transparentBackground"
+                             style="background-image: url('@media.Owner.Avatar'); border:0.1px solid white;"
+                             title="Ajouté par @media.Owner.Name"></div>
+                        @if (writeAccess && media.Shared)
+                        {
+                            <div class="UserSmallAvatar transparentBackground" style="background-image: url('/Content/UI-Images/shared.png'); margin-right:6px;" title="partagée"></div>
+                        }
+                    </div>
+                </a>
+
+                <div class="ellipsis" style="margin-left: 4px; margin-right: 4px; font-size: 0.8em; font-weight: bold">
+                    @media.Title
+                </div>
+                <div style="display: grid; grid-template-columns: auto 120px; align-items: last baseline ">
+
+                    <div style="margin-left: 4px; color: gray; font-size: 0.65em;">@media.Category <br /> <span style="color:dodgerBlue;">@Helper.When(media.PublishDate) </span></div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 5px; align-items: center; padding-right: 4px; cursor: pointer; color: dodgerblue">
+                        <span title="@media.UsersCommentList">@media.CommentsCount </span>
+                        <i class="cmdIconSmall @mediaCommentByConnectedUser fa-comment"></i>
+                        <span title="@media.UsersLikesList">@media.LikesCount </span>
+                        <i class="cmdIconSmall @mediaLikedByConnectedUser fa-thumbs-up toggleLikeCmd" mediaid="@media.Id"></i>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+    else
+    {
+        <h3>Aucun résulat</h3>
+    }
+}

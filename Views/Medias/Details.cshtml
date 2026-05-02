@@ -1,0 +1,230 @@
+﻿@model Models.Media
+@{
+    ViewBag.PageTitle = "Détails";
+    int currentMedia = (int)Session["currentMediaId"];
+    User user = Models.User.ConnectedUser;
+}
+
+<div id="detailsPanel_1" class="detailsPanel">
+    <!-- auto refreshed -->
+</div>
+<!-- this video player is outside refreshed panels in order to prevent stoping it each time there is a change in data -->
+<div id="Youtube_Player">
+    <!-- Will be removed if video not available any more in next refresh see ajax request below -->
+    @Helper.YoutubePlayer(Model.YoutubeId)
+</div>
+<div id="detailsPanel_2" class="detailsPanel">
+    <!-- auto refreshed slave of refresh of detailsPanel_1 -->
+</div>
+
+@if (Model != null)
+{
+
+    bool isVisible = Model.Shared || Models.User.ConnectedUser.IsAdmin || Model.OwnerId == user.Id;
+    if (isVisible)
+    {
+        <div id="CommentsSection">
+            <hr />
+            <!-- Create new comment command icon -->
+            <div class="commentFooter ">
+                <h4 style="margin-left:22px;">Commentaires</h4>
+                <div class="commentSubFooter" style="font-size:1em">
+                    <i class="newCommentCmd cmdIcon fa-regular fa-comment" style="margin-top:-3px; z-index:1;font-size:1.5em" parentId="0" title="Ajouter un commentaire"></i>
+                </div>
+            </div>
+
+            <details open style="position:relative; top:-40px;" id="commentDetails">
+                <summary style="border: none; background: none; "></summary>
+                <div style="text-align:right; margin-top:1px; padding-right:8px; padding-bottom:4px; ">
+                    <i class="cmdIconSmall fa fa-info-circle" title="À propos du Id Youtube" onclick="bootbox.alert(`Aide : <hr />Vous pouvez insérer une image ou un vidéo dans votre commentaire en y inscrivant l'URL. Assurez-vous d'avoir au moins un espace avant et après celui-ci. <br /> `)"> </i>
+                </div>
+                <!-- All comments rendering -->
+                <div class="commentsSection" id="commentsSection"> <!-- auto refreshed --> </div>
+
+                <!-- Hidden programmatically new comment UI -->
+                <div class="newCommentLayout" mediaId="@currentMedia" createCommentparentId="0">
+                    <div class="UserSmallAvatar" style="background-image:url('@user.Avatar')" title="@user.Name"></div>
+                    <textarea class="form-control" rows="1" placeholder="commenter"></textarea>
+                    <div><!--spacer--></div>
+                    <div class="editCommentFooter">
+                        <div><!--spacer--></div>
+                        <!-- Commit create command icon -->
+                        <span class="createCommentCmd cmdIconSmall fa fa-check" parentId="0"></span>
+                        <!-- Abort update command icon -->
+                        <span class="abortCreateCommentCmd cmdIconSmall fa fa-times" parentId="0"></span>
+                    </div>
+                </div>
+            </details>
+        </div>
+    }
+}
+
+@section Scripts {
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        let mediaDetails_ARP1 = null;
+        let mediaDetails_ARP2 = null;
+        let likes = null;
+        let scrollAnimationSpeed = 1000;
+        $(() => {
+            newSession(600);
+            mediaDetails_ARP1 = new AutoRefreshedPanel("detailsPanel_1", "/Medias/GetMediaDetails_1", 5, mediaDetailsPostRefresh);
+            mediaDetails_ARP2 = new AutoRefreshedPanel("detailsPanel_2", "/Medias/GetMediaDetails_2", -1);
+            likes = new AutoRefreshedPanel("likesPanel", "/Medias/GetMediaLikes", 5, likesPostRefresh);
+            commentsSection = new AutoRefreshedPanel("commentsSection", "/Medias/GetComments", 5, commentsSectionAttachEvents);
+            //commentsSectionAttachEvents();
+        })
+        function likesPostRefresh() {
+            $(".toggleLikeCmd").click(function (e) {
+                likes.command("/Medias/ToggleMediaLike/" + $(this).attr("mediaId"));
+                e.preventDefault();
+            });
+            commentsSection.refresh(true);
+        }
+        function mediaDetailsPostRefresh() {
+            mediaDetails_ARP2.refresh(true);
+            HideVideoIfNotAvailable();
+            $(".owner").on('click', function (e) {
+                if (e.shiftKey && e.ctrlKey) {
+                    mediaDetails_ARP1.pause();
+                    let ownerid = $(this).attr("ownerid");
+                    mediaDetails_ARP1.confirmedCommand("Prendre l'identité ?", `/Accounts/ChangeIdentity?userid=${ownerid}`);
+                    mediaDetails_ARP1.restart();
+                }
+            })
+            commentsSection.refresh(true);
+        }
+        function HideVideoIfNotAvailable() {
+            $.ajax({
+                url: "/Medias/CurrentVideoStillAvailable",
+                contentType: "application/json",
+                success: available => {
+                    if (!available) {
+                        $("#Youtube_Player").remove();
+                        $("#detailsPanel_2").remove();
+                        $("#CommentsSection").remove();
+                    }
+                },
+                statusCode: { 401: this.redirect }
+            })
+
+        }
+        function commentsSectionAttachEvents() {
+            $("#commentDetails .fa-thumbs-up").off();
+            $("#commentDetails .fa-thumbs-up").click(function (e) {
+                commentsSection.command("/Medias/ToggleCommentLike/" + $(this).attr("commentId"));
+                e.preventDefault();
+            });
+
+            $(".editCommentLayout").hide();
+            $(".newCommentLayout").hide();
+            $(".responseLayout").hide();
+
+            $(".commentLayout").on('click', function (e) {
+                if (e.shiftKey && e.ctrlKey) {
+                    commentsSection.pause();
+                    let commentId = $(this).attr("commentid");
+                    commentsSection.confirmedCommand("Effacer?", `/Medias/DeleteComment?id=${commentId}`);
+                    commentsSection.restart();
+                }
+            })
+            $(".newCommentCmd").off();
+            $(".newCommentCmd").click(function () {
+                $("#commentDetails").prop('open', true);
+
+                commentsSection.pause();
+                let parentId = $(this).attr("parentId");
+                $(`[createCommentparentId="${parentId}"]`).show();
+                $(`[createCommentparentId="${parentId}"] > textarea`).val("");
+
+                $('#content').animate({
+                    scrollTop: $(`[createCommentparentId="${parentId}"] > textarea`).offset().top
+                }, scrollAnimationSpeed)
+                    .promise()
+                    .done(() => { $(`[createCommentparentId="${parentId}"] > textarea`).focus(); });
+            })
+            $(".abortCreateCommentCmd").off();
+            $(".abortCreateCommentCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.restart();
+                let parentId = $(this).attr("parentId");
+                $(`[createCommentparentId="${parentId}"]`).hide();
+            })
+
+            $(".createCommentCmd").off();
+            $(".createCommentCmd").click(function (event) {
+                event.preventDefault();
+                let parentId = $(this).attr("parentId");
+                let commentText = $(this).parent().parent().find("textarea").val();
+                commentsSection.postCommand("/Medias/CreateComment", { parentId, commentText });
+                commentsSection.restart();
+            })
+            $(".CreateResponseCommentCmd").off();
+            $(".CreateResponseCommentCmd").click(function () {
+                commentsSection.pause();
+                let parentId = $(this).attr("parentId");
+                console.log($(`[createResponseparentId="${parentId}"]`)[0])
+                $(`[createResponseparentId="${parentId}"]`).show();
+                $(`[createResponseparentId="${parentId}"] > textarea`).val("");
+                $('#content').animate({
+                    scrollTop: $(`[createResponseparentId="${parentId}"] > textarea`).offset().top
+                }, scrollAnimationSpeed)
+                    .promise()
+                    .done(() => { $(`[createResponseparentId="${parentId}"] > textarea`).focus(); });
+
+            })
+            $(".abortCreateResponseCmd").off();
+            $(".abortCreateResponseCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.restart();
+                let parentId = $(this).attr("parentId");
+                $(`[createResponseparentId="${parentId}"]`).hide();
+            })
+
+            $(".createResponseCmd").off();
+            $(".createResponseCmd").click(function (event) {
+                event.preventDefault();
+                let parentId = $(this).attr("parentId");
+                let commentText = $(this).parent().parent().find("textarea").val();
+                commentsSection.postCommand("/Medias/CreateComment", { parentId, commentText });
+                commentsSection.restart();
+            })
+            $(".editCommentCmd").off();
+            $(".editCommentCmd").click(function () {
+                commentsSection.pause();
+                let id = $(this).attr("commentId");
+                $("#" + id).show();
+                $("#" + id + "> textarea").focus();
+                $("[commentId=" + id + "]").hide();
+            })
+
+            $(".abortEditCommentCmd").off();
+            $(".abortEditCommentCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.restart();
+                let id = $(this).attr("cmdCommentId");
+                $("#" + id).hide();
+                $("[commentId=" + id + "]").show();
+            })
+
+            $(".updateCommentCmd").off();
+            $(".updateCommentCmd").click(function (event) {
+                event.preventDefault();
+                let commentId = $(this).attr("cmdCommentId");
+                let commentText = $(this).parent().parent().find("textarea").val();
+                commentsSection.postCommand("/Medias/UpdateComment", { commentId, commentText });
+                commentsSection.restart();
+            })
+
+            $(".deleteCommentCmd").off()
+            $(".deleteCommentCmd").click(function (event) {
+                event.preventDefault();
+                commentsSection.pause();
+                let commentId = $(this).attr("cmdCommentId");
+                commentsSection.confirmedCommand("Effacer?", `/Medias/DeleteComment?id=${commentId}`);
+                commentsSection.restart();
+            })
+        }
+
+    </script>
+}

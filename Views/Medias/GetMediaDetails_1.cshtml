@@ -1,0 +1,32 @@
+﻿@model Models.Media
+
+@if (Model != null)
+{
+    int connectedId = Models.User.ConnectedUser.Id;
+    bool userLike = DAL.DB.Likes.ToList().Exists(l => (l.MediaId == Model.Id && l.UserId == connectedId));
+    string mediaLikedByConnectedUser = userLike ? "fa" : "fa-regular";
+    bool isVisible = Model.Shared || Models.User.ConnectedUser.IsAdmin || Model.OwnerId == connectedId;
+
+    if (isVisible)
+    {
+        <dl>
+            <dd>
+                @if ((Models.User.ConnectedUser.Id == Model.OwnerId || Models.User.ConnectedUser.IsAdmin) && Model.Shared)
+                {
+                    <span style="color:grey">[Partagé]</span>
+                }
+            </dd>
+            <dd>
+                @Model.Title
+            </dd>
+        </dl>
+    }
+    else
+    {
+        <h2 style="color:red">Cette vidéo n'est plus partagée...</h2>
+    }
+}
+else
+{
+    <h2 style="color:red">Cette vidéo a été effacée...</h2>
+}

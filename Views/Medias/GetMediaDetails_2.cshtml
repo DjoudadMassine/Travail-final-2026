@@ -1,0 +1,40 @@
+﻿@model Models.Media
+
+@if (Model != null)
+{
+    int connectedId = Models.User.ConnectedUser.Id;
+    bool userLike = DAL.DB.Likes.ToList().Exists(l => (l.MediaId == Model.Id && l.UserId == connectedId));
+    string mediaLikedByConnectedUser = userLike ? "fa" : "fa-regular";
+    bool isVisible = Model.Shared || Models.User.ConnectedUser.IsAdmin || Model.OwnerId == connectedId;
+
+    if (isVisible)
+    {
+        <dl>
+            <dd class="description">
+                @Model.Description
+            </dd>
+            <dt>
+                Catégorie
+            </dt>
+
+            <dd>
+                @Model.Category
+            </dd>
+
+            <dt>
+                Date de publication
+            </dt>
+
+            <dd>
+                @Helper.When(Model.PublishDate)
+            </dd>
+            <dt>
+                Ajouté par
+            </dt>
+
+            <dd class="owner" ownerid="@Model.OwnerId">
+                @Helper.AvatarUser(Model.Owner)
+            </dd>
+        </dl>
+    }
+}
