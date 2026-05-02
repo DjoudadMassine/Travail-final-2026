@@ -1,7 +1,24 @@
 
+.unselected {
+    text-decoration: none;
+    color: lightgray;
+}
+
+    .unselected:hover {
+        color: aqua;
+    }
+
+label {
+    margin-top: 8px;
+}
+
+a, .noDecoration {
+    color: black;
+    text-decoration: none;
+}
 
 form {
-    max-width: 4in;
+    max-width: 10in;
     margin: auto;
 }
 
@@ -100,4 +117,10 @@ summary {
     }
 }
 
-   
+.actionTitle {
+    font-size:1.3rem;
+}
+
+.highlight {
+    background-color: yellow;
+}
