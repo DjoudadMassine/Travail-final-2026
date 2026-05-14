@@ -1,22 +1,13 @@
-using DAL;
-using EmailHandling;
-using Models;
-using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
-using System.Timers;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
+using DAL;
 
 namespace LionelGroulx
 {
     public class MvcApplication : System.Web.HttpApplication
     {
-        //private static Timer appTimer;
-
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
@@ -28,77 +19,26 @@ namespace LionelGroulx
             CultureInfo.DefaultThreadCurrentCulture = culture;
             CultureInfo.DefaultThreadCurrentUICulture = culture;
 
-            /*
-            appTimer = new Timer();
-            appTimer.Interval = 10000000; // 10 second in milliseconds
-            appTimer.Elapsed += new ElapsedEventHandler(OnTimerElapsed);
-            appTimer.Enabled = true; // Start the timer
-            */
-            // cleaning
-            foreach (var login in DB.Logins.ToList().Copy())
-            {
-                if (login.User == null) DB.Logins.Delete(login.Id);
-            }
-            foreach (var uvEmail in DB.UnverifiedEmails.ToList().Copy())
-            {
-                if (uvEmail.User == null) DB.UnverifiedEmails.Delete(uvEmail.Id);
-            }
-            foreach (RenewPasswordCommand renewPC in DB.RenewPasswordCommands.ToList().Copy())
-            {
-                if (renewPC.User == null) DB.RenewPasswordCommands.Delete(renewPC.Id);
-            }
-            foreach (Models.Event @event in DB.Events.ToList().Copy())
-            {
-                if (@event.User == null) DB.RenewPasswordCommands.Delete(@event.Id);
-            }
-            foreach (var like in DB.Likes.ToList().Copy())
-            {
-                if (like.User == null || like.Media == null) DB.Likes.Delete(like.Id);
-            }
-            foreach (var like in DB.Commentlikes.ToList().Copy())
-            {
-                if (like.User == null || like.Comment == null) DB.Likes.Delete(like.Id);
-            }
-            foreach (Models.Comment comment in DB.Comments.ToList().Copy())
-            {
-                if (comment.Owner == null || comment.Media == null) DB.RenewPasswordCommands.Delete(comment.Id);
-            }
-            foreach (var notification in DB.Notifications.ToList().Copy())
-            {
-                if (notification.User == null || notification.User == null) DB.Notifications.Delete(notification.Id);
-            }
-            foreach (Models.Media media in DB.Medias.ToList().Copy())
-            {
-                if (media.Owner == null) DB.RenewPasswordCommands.Delete(media.Id);
-            }
+            // Force la création des fichiers JSON
+            DB.Users.ToList();
+            DB.Logins.ToList();
+            DB.Students.ToList();
+            DB.Courses.ToList();
+            DB.Teachers.ToList();
+            DB.Registrations.ToList();
+            DB.Allocations.ToList();
         }
-        /*
-        private static void OnTimerElapsed(object sender, ElapsedEventArgs e)
-        {
-            // Your cyclic function code goes here
-            // Be careful with threading, as this runs on a thread pool thread
-            System.Diagnostics.Debug.WriteLine("Cyclic function ran at: " + DateTime.Now);
-            
-        }*/
 
         protected void Session_Start()
         {
-            // do session intialisations
-
         }
+
         protected void Session_End()
         {
-            var connectedUser = Models.User.ConnectedUser;
-            if (connectedUser != null)
-                connectedUser.Online = false;
         }
-        protected void Application_End(object sender, EventArgs e)
+
+        protected void Application_End()
         {
-            /*if (appTimer != null)
-            {
-                appTimer.Enabled = false;
-                appTimer.Dispose();
-            }*/
         }
     }
 }

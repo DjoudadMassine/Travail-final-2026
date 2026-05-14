@@ -15,7 +15,7 @@ namespace Models
         [Required]
         public string Password { get; set; }
 
-        // admin / super / user
+        
         [Required]
         public string AccessLevel { get; set; }
 
