@@ -5,11 +5,6 @@ namespace LionelGroulx
 {
     public class RouteConfig
     {
-        public static string DefaultAction()
-        {
-            return "/Medias/List";
-        }
-
         public static void RegisterRoutes(RouteCollection routes)
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
@@ -17,7 +12,7 @@ namespace LionelGroulx
             routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Accounts", action = "Login", id = UrlParameter.Optional }
+                defaults: new { controller = "Students", action = "Index", id = UrlParameter.Optional }
             );
         }
     }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Web.ModelBinding;
 using System.Web.Mvc;
 
-namespace YourProjectName.Controllers
+namespace LionelGroulx.Controllers
 {
     public class StudentsController : Controller
     {

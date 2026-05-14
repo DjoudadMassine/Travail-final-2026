@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Models.Course>
+
+<h2>Liste des cours</h2>
+
+<p>
+    @Html.ActionLink("Ajouter un cours", "Create")
+</p>
+
+<table class="table">
+
+    <tr>
+        <th>Code</th>
+        <th>Titre</th>
+        <th>Session</th>
+        <th></th>
+    </tr>
+
+    @foreach (var course in Model)
+    {
+        <tr>
+            <td>@course.Code</td>
+            <td>@course.Title</td>
+            <td>@course.Session</td>
+
+            <td>
+                @Html.ActionLink("Détails", "Details", new { id = course.Id }) |
+                @Html.ActionLink("Modifier", "Edit", new { id = course.Id }) |
+                @Html.ActionLink("Supprimer", "Delete", new { id = course.Id })
+            </td>
+        </tr>
+    }
+
+</table>
