@@ -1,0 +1,19 @@
+﻿@model Models.Teacher
+
+<h2>Détails enseignant</h2>
+
+<div class="UserMediumAvatar"
+     style="background:url('@Model.Avatar'); background-size:cover; background-position:center;">
+</div>
+
+<hr />
+
+<p><strong>Code :</strong> @Model.Code</p>
+<p><strong>Nom :</strong> @Model.LastName @Model.FirstName</p>
+<p><strong>Téléphone :</strong> @Model.Phone</p>
+<p><strong>Date d'embauche :</strong> @Model.StartDate.ToString("yyyy-MM-dd")</p>
+
+<p>
+    @Html.ActionLink("Modifier", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Retour", "Index")
+</p>

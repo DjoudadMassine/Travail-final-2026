@@ -120,6 +120,12 @@ namespace DAL
                 if (!idExist)
                     throw new Exception("The class Repository cannot work with types that does not contain an attribute named Id of type int.");
                 string serverPath = HostingEnvironment.MapPath(@"~/App_Data/");
+
+                if (!Directory.Exists(serverPath))
+                {
+                    Directory.CreateDirectory(serverPath);
+                }
+
                 FilePath = Path.Combine(serverPath, typeof(T).Name + "s.json");
                 Init(FilePath);
             }

@@ -1,0 +1,27 @@
+﻿@model Models.Course
+
+<h2>Ajouter un cours</h2>
+
+@using (Html.BeginForm())
+{
+    <div class="form-group">
+        <label>Code</label>
+        @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Titre</label>
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Session</label>
+        @Html.TextBoxFor(m => m.Session, new { @class = "form-control", type = "number", min = "1", max = "6" })
+    </div>
+
+    <br />
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+}
+
+<br />
+@Html.ActionLink("Retour", "Index")

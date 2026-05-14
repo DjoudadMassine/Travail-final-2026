@@ -1,5 +1,6 @@
 ﻿using DAL;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -15,7 +16,9 @@ namespace Models
         public string LastName { get; set; }
 
         public string Email { get; set; }
-
+        public DateTime StartDate { get; set; }
+        public string Phone { get; set; }
+        public string Avatar { get; set; }
         [JsonIgnore]
         public string FullName => LastName + " " + FirstName;
 

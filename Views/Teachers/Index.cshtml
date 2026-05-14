@@ -6,25 +6,22 @@
     @Html.ActionLink("Ajouter un enseignant", "Create")
 </p>
 
-<table class="table">
-    <tr>
-        <th>Code</th>
-        <th>Nom</th>
-        <th>Courriel</th>
-        <th></th>
-    </tr>
+@foreach (var teacher in Model)
+{
+    <a href="@Url.Action("Details", "Teachers", new { id = teacher.Id })" class="TeacherLink">
 
-    @foreach (var teacher in Model)
-    {
-        <tr>
-            <td>@teacher.Code</td>
-            <td>@teacher.FullName</td>
-            <td>@teacher.Email</td>
-            <td>
-                @Html.ActionLink("Détails", "Details", new { id = teacher.Id }) |
-                @Html.ActionLink("Modifier", "Edit", new { id = teacher.Id }) |
-                @Html.ActionLink("Supprimer", "Delete", new { id = teacher.Id })
-            </td>
-        </tr>
-    }
-</table>
+        <div class="TeacherListLayout">
+            <img src="@teacher.Avatar"
+                 style="width:40px;height:40px;border-radius:50%;object-fit:cover;" />
+            <span class="teacherCode">
+                @teacher.Code
+            </span>
+
+            <span>
+                @teacher.LastName @teacher.FirstName
+            </span>
+
+        </div>
+
+    </a>
+}

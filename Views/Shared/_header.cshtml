@@ -5,64 +5,71 @@
     string controller = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString().ToLower();
     string action = HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString().ToLower();
 
+    string id = HttpContext.Current.Request.RequestContext.RouteData.Values["id"] != null
+        ? HttpContext.Current.Request.RequestContext.RouteData.Values["id"].ToString()
+        : "";
+
     bool search = Session["Search"] != null ? (bool)Session["Search"] : false;
     string searchString = Session["SearchString"] != null ? (string)Session["SearchString"] : "";
-    int currentMediaId = Session["CurrentMediaId"] != null ? (int)Session["CurrentMediaId"] : 0;
-    string currentMediaTitle = Session["currentMediaTitle"] != null ? (string)Session["currentMediaTitle"] : "";
-    string selectedCategory = Session["CurrentSelectedCategory"] != null ? (string)Session["CurrentSelectedCategory"] : "";
-    var mediaSortBy = Session["MediaSortBy"] != null ? (Models.MediaSortBy)Session["MediaSortBy"] : MediaSortBy.PublishDate;
     bool SearchAscending = Session["SortAscending"] != null ? (bool)Session["SortAscending"] : false;
 
-    string checkSortByTitle = mediaSortBy == MediaSortBy.Title ? "fa-check" : "";
-    string checkSortByDate = mediaSortBy == MediaSortBy.PublishDate ? "fa-check" : "";
-    string checkSortByLikes = mediaSortBy == MediaSortBy.Likes ? "fa-check" : "";
-    string checkSortByComments = mediaSortBy == MediaSortBy.Comments ? "fa-check" : "";
-    string iconSortBy = "";
-    string iconSortByTitle = "";
-    switch (mediaSortBy)
-    {
-        case MediaSortBy.Title: iconSortBy = "fa-solid fa-t"; iconSortByTitle = "Tri des vidéos par titre"; break;
-        case MediaSortBy.PublishDate: iconSortBy = "fa-regular fa-calendar"; iconSortByTitle = "Tri des vidéos par date de publication"; break;
-        case MediaSortBy.Likes: iconSortBy = "fa-regular fa-thumbs-up"; iconSortByTitle = "Tri des vidéos par nombre de j'aime"; break;
-        case MediaSortBy.Comments: iconSortBy = "fa-regular fa-comment"; iconSortByTitle = "Tri des vidéos par nombre de commentaires"; break;
-    }
+    bool userConnected = Session["UserId"] != null;
+    bool userIsAdmin = Session["AccessLevel"] != null && Session["AccessLevel"].ToString() == "admin";
+    bool userCanWrite = !userConnected || Session["AccessLevel"] == null ||
+                        Session["AccessLevel"].ToString() == "admin" ||
+                        Session["AccessLevel"].ToString() == "super";
 
-    var Categories = (List<string>)Session["Categories"];
+    string index = "/" + controller;
+    string currentItemTitle = ViewBag.PageTitle != null ? ViewBag.PageTitle.ToString() : "";
 
-    bool userConnected = Models.User.ConnectedUser != null;
-    bool userIsAdmin = userConnected ? Models.User.ConnectedUser.IsAdmin : false;
-    bool userCanWrite = userConnected ? Models.User.ConnectedUser.CanWrite : false;
-    string index = RouteConfig.DefaultAction();
+    string checkSortByTitle = "";
+    string checkSortByDate = "";
+    string checkSortByLikes = "";
+    string checkSortByComments = "";
+
+    string iconSortBy = "fa-solid fa-arrow-down-a-z";
+    string iconSortByTitle = "Tri alphabétique";
 }
 
 <div class="section roundedBorder">
     <div class="headerMenu">
-        <i class="siteIcon"></i>
+        <img src="/WebApp.png" style="height:42px; margin-right:10px;" />
+
         <div class="pageTitle"> @ViewBag.PageTitle </div>
+
         <!-- Direct action context command icons -->
         @switch (action)
         {
-            case "login": break;
+            case "login":
+                break;
+
             case "subscribe":
                 <div id="mainMenuPanel" class="menu">
                     <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.getElementById('submit').click()"></i>
                     <a class="cmdIcon fa fa-square-xmark" title="Annuler" onclick="history.back()"></a>
                 </div>
                 break;
+
             case "editprofil":
                 <div id="mainMenuPanel" class="menu">
                     <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.getElementById('submit').click()"></i>
                     <a class="cmdIcon fa fa-square-xmark" title="Annuler" onclick="history.back()"></a>
                 </div>
                 break;
+
+            case "index":
             case "list":
                 <div id="mainMenuPanel" class="menu">
+                    <a href="/Students" class="cmdIcon fa fa-user-graduate" title="Étudiants"></a>
+                    <a href="/Courses" class="cmdIcon fa fa-book" title="Cours"></a>
+                    <a href="/Teachers" class="cmdIcon fa fa-chalkboard-user" title="Profs"></a>
+
                     @if (userCanWrite)
                     {
                         <a href="/@controller/Create" class="cmdIcon fa fa-circle-plus" title="Ajouter..."></a>
                     }
 
-                    <a href="/@controller/ToggleMediaSort" class="cmdIcon @iconSortBy" title="@iconSortByTitle"></a>
+                    <a href="/@controller/ToggleSort" class="cmdIcon @iconSortBy" title="@iconSortByTitle"></a>
 
                     @if (SearchAscending)
                     {
@@ -81,16 +88,46 @@
                         <div data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="cmdIcon fa fa-bars" title="Menu"></i>
                         </div>
+
                         <!-- Drop down menu items -->
                         <div class="dropdown-menu noselect" id="DDMenu" style="width:300px !important">
                             <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa fa-address-card"></i>
-                                <a href="/Accounts/EditProfil">Profil...</a>
+                                <i class="menuIcon fa fa-user-graduate"></i>
+                                <a href="/Students">Étudiants</a>
                             </div>
+
                             <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa fa-sign-out"></i>
-                                <a href="/Accounts/Logout">Déconnexion...</a>
+                                <i class="menuIcon fa fa-book"></i>
+                                <a href="/Courses">Cours</a>
                             </div>
+
+                            <div class="dropdown-item item-layout">
+                                <i class="menuIcon fa fa-chalkboard-user"></i>
+                                <a href="/Teachers">Profs</a>
+                            </div>
+
+                            <div class="dropdown-divider"></div>
+
+                            @if (userConnected)
+                            {
+                                <div class="dropdown-item item-layout">
+                                    <i class="menuIcon fa fa-address-card"></i>
+                                    <a href="/Accounts/EditProfil">Profil...</a>
+                                </div>
+
+                                <div class="dropdown-item item-layout">
+                                    <i class="menuIcon fa fa-sign-out"></i>
+                                    <a href="/Accounts/Logout">Déconnexion...</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="dropdown-item item-layout">
+                                    <i class="menuIcon fa fa-sign-in"></i>
+                                    <a href="/Accounts/Login">Connexion...</a>
+                                </div>
+                            }
+
                             @if (userIsAdmin)
                             {
                                 <div class="dropdown-divider"></div>
@@ -101,38 +138,25 @@
                                         Gestion des usagers...
                                     </a>
                                 </div>
+
                                 <div class="dropdown-item item-layout">
                                     <i class="menuIcon fa fa-calendar-days"></i>
                                     <a href="/Accounts/LoginsJournal">
                                         Historique de connexions...
                                     </a>
                                 </div>
-                                <div class="dropdown-item item-layout">
-                                    <i class="menuIcon fa fa-gear"></i>
-                                    <a href="/Accounts/EventsJournal">
-                                        Journal d'activités...
-                                    </a>
-                                </div>
                             }
 
                             <div class="dropdown-divider"></div>
 
+                            <div class="dropdown-item item-layout">
+                                <i class="menuIcon fa @checkSortByTitle"></i>
+                                <a href="/@controller/SetSortBy?sortBy=Title">Trier par titre/nom</a>
+                            </div>
 
                             <div class="dropdown-item item-layout">
                                 <i class="menuIcon fa @checkSortByDate"></i>
-                                <a href="/Medias/SetMediaSortBy?mediaSortBy=@MediaSortBy.PublishDate">Trier par date</a>
-                            </div>
-                            <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa @checkSortByTitle"></i>
-                                <a href="/Medias/SetMediaSortBy?mediaSortBy=@MediaSortBy.Title">Trier par titre</a>
-                            </div>
-                            <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa @checkSortByLikes"></i>
-                                <a href="/Medias/SetMediaSortBy?mediaSortBy=@MediaSortBy.Likes">Trier par j'aimes</a>
-                            </div>
-                            <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa @checkSortByComments"></i>
-                                <a href="/Medias/SetMediaSortBy?mediaSortBy=@MediaSortBy.Comments">Trier par commentaires</a>
+                                <a href="/@controller/SetSortBy?sortBy=Date">Trier par date/session</a>
                             </div>
 
                             <div class="dropdown-divider"></div>
@@ -145,38 +169,39 @@
                     </div>
                 </div>
                 break;
+
             case "details":
                 <div id="mainMenuPanel" class="menu">
-                    <div id="likesPanel">
-                        <!-- auto refreshed -->
-                    </div>
-                    @if (userCanWrite && (bool)ViewBag.IsOwner)
+                    @if (userCanWrite)
                     {
-                        <a href="/@controller/Edit" class="cmdIcon fa fa-pen-to-square" title="Modifier..."></a>
+                        <a href="/@controller/Edit/@id" class="cmdIcon fa fa-pen-to-square" title="Modifier..."></a>
                         <i class="cmdIcon fa fa-trash-can"
                            title="Effacer"
-                           onclick="bootbox.confirm(`<b style=color:red>Effacer le Media : </b><h3>@currentMediaTitle?</h3>`, function(result){ if (result) window.location = '/@controller/Delete'; })">
+                           onclick="bootbox.confirm(`<b style=color:red>Effacer : </b><h3>@currentItemTitle?</h3>`, function(result){ if (result) window.location = '/@controller/Delete/@id'; })">
                         </i>
                     }
 
-                    <a href="/@controller/List" class="cmdIcon fa fa-square-xmark" title="retour"></a>
+                    <a href="/@controller/Index" class="cmdIcon fa fa-square-xmark" title="retour"></a>
                 </div>
                 break;
+
             case "create":
                 if (userCanWrite)
                 {
                     <div id="mainMenuPanel" class="menu">
-                        <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.getElementById('submit').click()"></i>
+                        <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.querySelector('form').submit()"></i>
                         <a href="@index" class="cmdIcon fa fa-square-xmark" title="Annuler"></a>
                     </div>
                 }
                 break;
+
             case "edit":
                 <div id="mainMenuPanel" class="menu">
-                    <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.getElementById('submit').click()"></i>
-                    <a href="/@controller/Details/@currentMediaId" class="cmdIcon fa fa-square-xmark" title="Annuler"></a>
+                    <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.querySelector('form').submit()"></i>
+                    <a href="/@controller/Details/@id" class="cmdIcon fa fa-square-xmark" title="Annuler"></a>
                 </div>
                 break;
+
             case "loginsjournal":
             case "eventsjournal":
             case "manageusers":
@@ -186,27 +211,12 @@
                 </div>
                 break;
         }
-
     </div>
 </div>
-@if (search && controller=="medias" && action == "list")
+
+@if (search && (action == "index" || action == "list"))
 {
     <div class="searchBar">
         <input type="search" id="searchInput" class="section roundedBorder searchBarItem" value="@searchString" placeholder="Recherche...">
-        <div id="categorySelectPanel" class="searchBarItem">
-            <!-- Dynamically refreshed -->
-            @{
-                Html.RenderPartial("GetMediasCategoriesList");
-            }
-
-        </div>
-        <div id="ownerSelectPanel" class="searchBarItem">
-            <!-- Dynamically refreshed -->
-            @{
-                Html.RenderPartial("GetMediasOwnersList");
-            }
-        </div>
     </div>
 }
-
-

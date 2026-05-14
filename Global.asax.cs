@@ -27,6 +27,10 @@ namespace LionelGroulx
             DB.Teachers.ToList();
             DB.Registrations.ToList();
             DB.Allocations.ToList();
+
+
+
+
         }
 
         protected void Session_Start()

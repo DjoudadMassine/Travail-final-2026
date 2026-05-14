@@ -19,16 +19,17 @@ namespace LionelGroulx
                             "~/Scripts/image-control.js"));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
-                        "~/Content/_layout.css",
-                        "~/Content/Accounts.css",
-                        "~/Content/popup.css",
-                        "~/Content/Selection.css",
-                        "~/Content/site.css",
-                        "~/Content/menu.css", 
-                        "~/Content/media.css",
-                        "~/Content/Icons.css",
-                        "~/Content/image-control.css",
-                        "~/Content/jqui-custom-datepicker.css"));
+           "~/Content/_layout.css",
+           "~/Content/popup.css",
+           "~/Content/Selection.css",
+           "~/Content/site.css",
+           "~/Content/menu.css",
+           "~/Content/Icons.css",
+
+           "~/Content/Students.css",
+           "~/Content/Teachers.css",
+           "~/Content/Courses.css"
+       ));
         }
     }
 }
