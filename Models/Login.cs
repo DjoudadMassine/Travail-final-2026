@@ -1,4 +1,5 @@
 ﻿using DAL;
+using System;
 
 namespace Models
 {
@@ -9,5 +10,7 @@ namespace Models
         public string Email { get; set; }
 
         public string Password { get; set; }
+
+        public DateTime LoginDate { get; set; }
     }
 }

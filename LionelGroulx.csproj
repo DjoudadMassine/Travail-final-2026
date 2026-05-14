@@ -108,12 +108,16 @@
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="Controllers\AccessControl.cs" />
+    <Compile Include="Controllers\AccountsController.cs" />
+    <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TeachersController.cs" />
     <Compile Include="Controllers\CoursesController.cs" />
     <Compile Include="Controllers\StudentsController.cs" />
     <Compile Include="DAL\AssetAttribute.cs" />
     <Compile Include="DAL\DB.cs" />
     <Compile Include="DAL\ImageAsset.cs" />
+    <Compile Include="DAL\UsersRepository.cs" />
     <Compile Include="DAL\Record.cs" />
     <Compile Include="DAL\LoginsRepository.cs" />
     <Compile Include="DAL\Repository.cs" />
@@ -123,6 +127,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Login.cs" />
+    <Compile Include="Models\LoginCredential.cs" />
     <Compile Include="Models\Teacher.cs" />
     <Compile Include="Models\Student.cs" />
     <Compile Include="Models\Course.cs" />
@@ -146,6 +151,7 @@
     <Content Include="App_Assets\Teachers\no_avatar.png" />
     <Content Include="Content\Courses.css" />
     <Content Include="Content\Selections.css" />
+    <Content Include="Content\menu.css" />
     <Content Include="Content\_layout.css" />
     <Content Include="Content\site.css" />
     <Content Include="Content\Students.css" />
@@ -217,6 +223,23 @@
     <Content Include="Views\Courses\Details.cshtml" />
     <Content Include="Views\Courses\Create.cshtml" />
     <Content Include="Views\Courses\Edit.cshtml" />
+    <Content Include="Views\Accounts\EditProfil.cshtml" />
+    <Content Include="Views\Accounts\EventsJournal.cshtml" />
+    <Content Include="Views\Accounts\GetEventsList.cshtml" />
+    <Content Include="Views\Accounts\GetLoginsList.cshtml" />
+    <Content Include="Views\Accounts\GetUsers.cshtml" />
+    <Content Include="Views\Accounts\Login.cshtml" />
+    <Content Include="Views\Accounts\LoginsJournal.cshtml" />
+    <Content Include="Views\Accounts\ManageUsers.cshtml" />
+    <Content Include="Views\Accounts\ProfilForm.cshtml" />
+    <Content Include="Views\Accounts\RenewPassword.cshtml" />
+    <Content Include="Views\Accounts\RenewPasswordCommand.cshtml" />
+    <Content Include="Views\Accounts\Subscribe.cshtml" />
+    <Content Include="Views\Home\About.cshtml" />
+    <Content Include="Views\Home\Contact.cshtml" />
+    <Content Include="Views\Home\GetData.cshtml" />
+    <Content Include="Views\Home\Index.cshtml" />
+    <Content Include="Views\Home\ProtectedView.cshtml" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

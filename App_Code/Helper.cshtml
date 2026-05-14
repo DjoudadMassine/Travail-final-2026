@@ -100,4 +100,19 @@
     {
         <span>✗</span>
     }
+
+}
+
+
+@helper Image(string url, string cssClass)
+{
+    <div class="@cssClass" style="background:url('@url'); background-size:cover; background-position:center;"></div>
+}
+@helper ImageUploader(string targetControlId, string imageUrl, string TooltipMessage = "")
+{
+    <div class="imageUploader"
+         controlId="@targetControlId"
+         imageSrc="@imageUrl"
+         title="@TooltipMessage">
+    </div>
 }
