@@ -10,17 +10,12 @@ namespace DAL
         public static DB Instance { get { return instance; } }
         #endregion
 
-        static public UsersRepository Users { get; set; }
-            = new UsersRepository();
-
-        static public NotificationsRepository Notifications { get; set; }
-            = new NotificationsRepository();
+        // Comptes / sécurité
+        static public Repository<User> Users { get; set; }
+            = new Repository<User>();
 
         static public LoginsRepository Logins { get; set; }
             = new LoginsRepository();
-
-        static public EventsRepository Events { get; set; }
-            = new EventsRepository();
 
         static public Repository<UnverifiedEmail> UnverifiedEmails { get; set; }
             = new Repository<UnverifiedEmail>();
@@ -28,16 +23,20 @@ namespace DAL
         static public Repository<RenewPasswordCommand> RenewPasswordCommands { get; set; }
             = new Repository<RenewPasswordCommand>();
 
-        static public MediasRepository Medias { get; set; }
-            = new MediasRepository();
+        // PFI Programme 420
+        static public Repository<Student> Students { get; set; }
+            = new Repository<Student>();
 
-        static public LikesRepository Likes { get; set; }
-           = new LikesRepository();
+        static public Repository<Course> Courses { get; set; }
+            = new Repository<Course>();
 
-        static public CommentLikesRepository Commentlikes { get; set; }
-            = new CommentLikesRepository();
+        static public Repository<Teacher> Teachers { get; set; }
+            = new Repository<Teacher>();
 
-        static public CommentsRepository Comments { get; set; }
-           = new CommentsRepository();
+        static public Repository<Registration> Registrations { get; set; }
+            = new Repository<Registration>();
+
+        static public Repository<Allocation> Allocations { get; set; }
+            = new Repository<Allocation>();
     }
 }

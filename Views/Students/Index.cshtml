@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Models.Student>
+
+@{
+    ViewBag.Title = "Étudiants";
+}
+
+<h2>Liste des étudiants</h2>
+
+<p>
+    @Html.ActionLink("Ajouter un étudiant", "Create")
+</p>
+
+<table class="table">
+    <tr>
+        <th>Code</th>
+        <th>Nom</th>
+        <th>Courriel</th>
+        <th></th>
+    </tr>
+
+    @foreach (var student in Model)
+    {
+        <tr>
+            <td>@student.Code</td>
+            <td>@student.FullName</td>
+            <td>@student.Email</td>
+
+            <td>
+                @Html.ActionLink("Détails", "Details", new { id = student.Id }) |
+                @Html.ActionLink("Modifier", "Edit", new { id = student.Id }) |
+                @Html.ActionLink("Supprimer", "Delete", new { id = student.Id })
+            </td>
+        </tr>
+    }
+
+</table>

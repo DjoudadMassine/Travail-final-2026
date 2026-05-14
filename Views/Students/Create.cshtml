@@ -1,0 +1,35 @@
+﻿@model Models.Student
+
+@{
+    ViewBag.Title = "Créer étudiant";
+}
+
+<h2>Créer étudiant</h2>
+
+@using (Html.BeginForm())
+{
+    <div class="form-group">
+        <label>Prénom</label>
+        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Nom</label>
+        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Courriel</label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-primary">
+        Ajouter
+    </button>
+}
+
+<br />
+
+@Html.ActionLink("Retour", "Index")

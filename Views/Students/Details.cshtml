@@ -1,0 +1,30 @@
+﻿@model Models.Student
+
+@{
+    ViewBag.Title = "Détails étudiant";
+}
+
+<h2>Détails étudiant</h2>
+
+<hr />
+
+<dl class="dl-horizontal">
+
+    <dt>Code</dt>
+    <dd>@Model.Code</dd>
+
+    <dt>Prénom</dt>
+    <dd>@Model.FirstName</dd>
+
+    <dt>Nom</dt>
+    <dd>@Model.LastName</dd>
+
+    <dt>Courriel</dt>
+    <dd>@Model.Email</dd>
+
+</dl>
+
+<p>
+    @Html.ActionLink("Modifier", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("Retour", "Index")
+</p>

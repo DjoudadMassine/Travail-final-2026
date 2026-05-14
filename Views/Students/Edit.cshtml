@@ -1,0 +1,38 @@
+﻿@model Models.Student
+
+@{
+    ViewBag.Title = "Modifier étudiant";
+}
+
+<h2>Modifier étudiant</h2>
+
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(m => m.Id)
+    @Html.HiddenFor(m => m.Code)
+
+    <div class="form-group">
+        <label>Prénom</label>
+        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Nom</label>
+        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+    </div>
+
+    <div class="form-group">
+        <label>Courriel</label>
+        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+    </div>
+
+    <br />
+
+    <button type="submit" class="btn btn-success">
+        Sauvegarder
+    </button>
+}
+
+<br />
+
+@Html.ActionLink("Retour", "Index")
