@@ -1,5 +1,31 @@
 ﻿.StudentListLayout {
     display: grid;
+    grid-template-columns: 120px 250px 300px;
+    align-items: center;
+    min-height: 40px;
+    padding: 8px 12px;
+    margin-bottom: 4px;
+    font-size: larger;
+    font-family: 'Times New Roman';
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+    .StudentListLayout:hover {
+        background-color: azure;
+    }
+
+    .StudentListLayout a {
+        text-decoration: none;
+        color: black;
+    }
+
+.studentCode {
+    color: blue;
+    font-weight: bold;
+}
+/*.StudentListLayout {
+    display: grid;
     grid-template-columns: auto auto;
     height: 30px;
     align-items: center;
@@ -8,11 +34,11 @@
     padding-left: 6px;
     border-radius: 6px;
     font-family: 'Times New Roman';
-    
 }
+
     .StudentListLayout a {
         text-decoration: none;
-        color:black;
+        color: black;
     }
 
     .StudentListLayout:hover {
@@ -26,6 +52,7 @@
     .StudentListLayout:hover .icon {
         display: block !important;
     }
-    .studentCode {
-        color:blue;
-    }
+
+.studentCode {
+    color: blue;
+}*/

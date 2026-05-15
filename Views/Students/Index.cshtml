@@ -10,27 +10,24 @@
     @Html.ActionLink("Ajouter un étudiant", "Create")
 </p>
 
-<table class="table">
-    <tr>
-        <th>Code</th>
-        <th>Nom</th>
-        <th>Courriel</th>
-        <th></th>
-    </tr>
+<div>
+    <div class="StudentListLayout">
+        <div><strong>Code</strong></div>
+        <div><strong>Nom</strong></div>
+        <div><strong>Courriel</strong></div>
+    </div>
 
     @foreach (var student in Model)
     {
-        <tr>
-            <td>@student.Code</td>
-            <td>@student.FullName</td>
-            <td>@student.Email</td>
+        <div class="StudentListLayout"
+             onclick="window.location='@Url.Action("Details", "Students", new { id = student.Id })'">
 
-            <td>
-                @Html.ActionLink("Détails", "Details", new { id = student.Id }) |
-                @Html.ActionLink("Modifier", "Edit", new { id = student.Id }) |
-                @Html.ActionLink("Supprimer", "Delete", new { id = student.Id })
-            </td>
-        </tr>
+            <div class="studentCode">@student.Code</div>
+
+            <div>@student.FullName</div>
+
+            <div>@student.Email</div>
+
+        </div>
     }
-
-</table>
+</div>
