@@ -78,3 +78,52 @@
 .flexItem {
     flex: 1;
 }
+.sectionTabs {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-left: 25px;
+}
+
+.menuLink {
+    font-size: 1.1rem;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.menuLinkSelected {
+    font-weight: bold;
+    color: black;
+}
+
+.menuLinkUnselected {
+    color: #aaa;
+}
+
+    .menuLinkUnselected:hover {
+        color: rgb(103, 165, 247);
+    }
+.headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.sectionTabs {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-left: 20px;
+}
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+}
+
+.sectionTabs {
+    display: flex;
+    gap: 18px;
+    align-items: center;
+}

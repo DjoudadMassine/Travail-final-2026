@@ -35,7 +35,30 @@
     <div class="headerMenu">
         <img src="/WebApp.png" style="height:42px; margin-right:10px;" />
 
-        <div class="pageTitle"> @ViewBag.PageTitle </div>
+        <div class="headerLeft">
+            <div class="pageTitle">@ViewBag.PageTitle</div>
+
+            @if (action == "index" || action == "list")
+            {
+                string studentsClass = controller == "students"
+                    ? "menuLink menuLinkSelected"
+                    : "menuLink menuLinkUnselected";
+
+                string coursesClass = controller == "courses"
+                    ? "menuLink menuLinkSelected"
+                    : "menuLink menuLinkUnselected";
+
+                string teachersClass = controller == "teachers"
+                    ? "menuLink menuLinkSelected"
+                    : "menuLink menuLinkUnselected";
+
+                <div class="sectionTabs">
+                    <a href="/Students" class="@studentsClass">Étudiants</a>
+                    <a href="/Courses" class="@coursesClass">Cours</a>
+                    <a href="/Teachers" class="@teachersClass">Profs</a>
+                </div>
+            }
+        </div>
 
         <!-- Direct action context command icons -->
         @switch (action)
@@ -60,9 +83,10 @@
             case "index":
             case "list":
                 <div id="mainMenuPanel" class="menu">
-                    <a href="/Students" class="cmdIcon fa fa-user-graduate" title="Étudiants"></a>
-                    <a href="/Courses" class="cmdIcon fa fa-book" title="Cours"></a>
-                    <a href="/Teachers" class="cmdIcon fa fa-chalkboard-user" title="Profs"></a>
+ 
+                    
+
+                    <div class="menu">
 
                     @if (userCanWrite)
                     {
@@ -168,6 +192,8 @@
                         </div>
                     </div>
                 </div>
+                    </div>
+                    
                 break;
 
             case "details":

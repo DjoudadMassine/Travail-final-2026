@@ -135,6 +135,7 @@
     <Compile Include="Models\Allocation.cs" />
     <Compile Include="Models\User.cs" />
     <Compile Include="Models\SelectListUtilities.cs" />
+    <Compile Include="obj\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WebServices\Countries.cs" />
     <Compile Include="WebServices\GeoLocation.cs" />
@@ -149,6 +150,13 @@
     <Content Include="App_Assets\Teachers\f9a42fd9-87e4-41d6-87c6-50fa3526db49.jpeg" />
     <Content Include="App_Assets\Teachers\fbb51b24-2763-4d30-b175-6a78856ade4b.jpeg" />
     <Content Include="App_Assets\Teachers\no_avatar.png" />
+    <Content Include="bin\fr\System.Web.Helpers.resources.dll" />
+    <Content Include="bin\fr\System.Web.Mvc.resources.dll" />
+    <Content Include="bin\fr\System.Web.Optimization.resources.dll" />
+    <Content Include="bin\fr\System.Web.Razor.resources.dll" />
+    <Content Include="bin\fr\System.Web.WebPages.Deployment.resources.dll" />
+    <Content Include="bin\fr\System.Web.WebPages.Razor.resources.dll" />
+    <Content Include="bin\fr\System.Web.WebPages.resources.dll" />
     <Content Include="Content\Courses.css" />
     <Content Include="Content\Selections.css" />
     <Content Include="Content\menu.css" />
@@ -195,7 +203,9 @@
     <Content Include="Views\Shared\_Layout.cshtml" />
     <Content Include="WebApp.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="obj\Debug\TempPE\" />
+  </ItemGroup>
   <ItemGroup>
     <Content Include="App_Code\Helper.cshtml" />
     <Content Include="App_Data\Allocations.json" />
@@ -207,6 +217,8 @@
     <Content Include="App_Data\Teachers.json" />
     <Content Include="App_Data\UnverifiedEmails.json" />
     <Content Include="App_Data\Users.json" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <Content Include="obj\Debug\LionelGroulx.csproj.AssemblyReference.cache" />
     <None Include="packages.config" />
     <Content Include="Views\Shared\_header.cshtml" />
     <None Include="Properties\PublishProfiles\LionelGroulx20260514114159 - Web Deploy.pubxml" />
