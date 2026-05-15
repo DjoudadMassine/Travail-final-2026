@@ -1,39 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Web;
 
 namespace Models
 {
-    public sealed class NextSession
+    public static class NextSession
     {
-        public const int January = 1;
-        public const int August = 8;
-
-        private static readonly NextSession instance = new NextSession();
-        public static NextSession Instance { get { return instance; } }
-
-        public static DateTime CurrentDate = DateTime.Now;
-
-        public static List<int> ValidSessions
+        public static DateTime CurrentDate
         {
             get
             {
-                List<int> result = new List<int>();
+                if (HttpContext.Current.Session != null)
+                {
+                    if (HttpContext.Current.Session["CurrentDate"] == null)
+                        HttpContext.Current.Session["CurrentDate"] = DateTime.Now;
 
-                if (CurrentDate.Month > January && CurrentDate.Month <= August)
-                {
-                    result.Add(1);
-                    result.Add(3);
-                    result.Add(5);
-                }
-                else
-                {
-                    result.Add(2);
-                    result.Add(4);
-                    result.Add(6);
+                    return (DateTime)HttpContext.Current.Session["CurrentDate"];
                 }
 
-                return result;
+                return DateTime.Now;
+            }
+            set
+            {
+                HttpContext.Current.Session["CurrentDate"] = value;
             }
         }
 
@@ -41,12 +30,21 @@ namespace Models
         {
             get
             {
-                int value = CurrentDate.Year;
+                if (CurrentDate.Month >= 8)
+                    return CurrentDate.Year + 1;
 
-                if (CurrentDate.Month > August && CurrentDate.Month <= 12)
-                    value++;
+                return CurrentDate.Year;
+            }
+        }
 
-                return value;
+        public static List<int> ValidSessions
+        {
+            get
+            {
+                if (CurrentDate.Month >= 8)
+                    return new List<int> { 1, 3, 5 };
+
+                return new List<int> { 2, 4, 6 };
             }
         }
 
@@ -54,13 +52,19 @@ namespace Models
         {
             get
             {
-                return (ValidSessions.Contains(1) ? "Automne " : "Hiver ") + Year;
+                if (CurrentDate.Month >= 8)
+                    return "Hiver " + Year;
+
+                return "Automne " + Year;
             }
         }
 
         public static string Caption
         {
-            get { return "Session courante : " + ShortCaption; }
+            get
+            {
+                return "Session courante : " + ShortCaption;
+            }
         }
     }
 }
