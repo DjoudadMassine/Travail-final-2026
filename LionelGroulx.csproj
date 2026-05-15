@@ -207,6 +207,7 @@
     <Content Include="App_Data\Teachers.json" />
     <Content Include="App_Data\UnverifiedEmails.json" />
     <Content Include="App_Data\Users.json" />
+    <Content Include="App_Data\Inscriptions.json" />
     <None Include="packages.config" />
     <Content Include="Views\Shared\_header.cshtml" />
     <None Include="Properties\PublishProfiles\LionelGroulx20260514114159 - Web Deploy.pubxml" />

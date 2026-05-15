@@ -1,6 +1,7 @@
 ﻿using DAL;
 using Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.ModelBinding;
 using System.Web.Mvc;
@@ -97,18 +98,47 @@ namespace LionelGroulx.Controllers
             if (student == null)
                 return RedirectToAction("Index");
 
+            var allCourses = DB.Courses.ToList();
+
+            var registrations = DB.Registrations.ToList()
+                .Where(r => r.StudentId == student.Id)
+                .ToList();
+
+            var studentCourses = registrations
+                .Select(r => r.Course)
+                .ToList();
+
+            var availableCourses = allCourses
+                .Where(c => !studentCourses.Any(sc => sc.Id == c.Id))
+                .ToList();
+
+            ViewBag.StudentCourses = studentCourses;
+            ViewBag.AvailableCourses = availableCourses;
+
             return View(student);
         }
 
         // POST: Students/Edit/5
         [HttpPost]
-        public ActionResult Edit(Student student)
+        public ActionResult Edit(Student student, int[] coursesToAdd)
         {
             if (ModelState.IsValid)
             {
                 DB.Students.Update(student);
 
-                return RedirectToAction("Details", new { id = student.Id });
+                if (coursesToAdd != null)
+                {
+                    foreach (int courseId in coursesToAdd)
+                    {
+                        Registration registration = new Registration();
+                        registration.StudentId = student.Id;
+                        registration.CourseId = courseId;
+
+                        DB.Registrations.Add(registration);
+                    }
+                }
+
+                return RedirectToAction("Edit", new { id = student.Id });
             }
 
             return View(student);

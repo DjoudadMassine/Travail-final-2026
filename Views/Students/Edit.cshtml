@@ -4,7 +4,7 @@
     ViewBag.Title = "Étudiant - Modification";
 }
 
-@using (Html.BeginForm())
+@using (Html.BeginForm("Edit", "Students", FormMethod.Post, new { id = "studentEditForm" }))
 {
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.Code)
@@ -31,8 +31,22 @@
         </div>
 
         <div class="editField">
+            <label>Date de naissance</label>
+            @Html.TextBoxFor(
+                m => m.BirthDate,
+                "{0:yyyy-MM-dd}",
+                new { @class = "editInput", type = "date" }
+            )
+        </div>
+
+        <div class="editField">
             <label>Courriel</label>
             @Html.TextBoxFor(m => m.Email, new { @class = "editInput" })
+        </div>
+
+        <div class="editField">
+            <label>Téléphone</label>
+            @Html.TextBoxFor(m => m.Phone, new { @class = "editInput" })
         </div>
 
         <div class="editSectionTitle">
@@ -40,18 +54,25 @@
         </div>
 
         <div class="dualListZone">
-            <select multiple class="editList">
-                <option>[1] 420-KB1-LG Introduction...</option>
-                <option>[3] 420-KB9-LG Développem...</option>
-                <option>[5] 420-KBG-LG Développem...</option>
-            </select>
 
             <select multiple class="editList">
-                <option>[1] 201-KB1-LG Mathématiq...</option>
-                <option>[1] 420-KB2-LG Conception...</option>
-                <option>[3] 420-KB8-LG Programmat...</option>
-                <option>[5] 420-KBF-LG Profession...</option>
+                @foreach (var course in ViewBag.StudentCourses)
+                {
+                    <option value="@course.Id">
+                        [@course.Session] @course.Code @course.Title
+                    </option>
+                }
             </select>
+
+            <select multiple class="editList" name="coursesToAdd">
+                @foreach (var course in ViewBag.AvailableCourses)
+                {
+                    <option value="@course.Id">
+                        [@course.Session] @course.Code @course.Title
+                    </option>
+                }
+            </select>
+
         </div>
 
         <div class="infoBubble">
@@ -64,3 +85,16 @@
         Session courante : Automne 2026
     </div>
 }
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const checkButton = document.querySelector(".fa-check, .fa-check-circle, .bi-check, .checkButton, .saveIcon");
+
+        if (checkButton) {
+            checkButton.addEventListener("click", function (event) {
+                event.preventDefault();
+                document.getElementById("studentEditForm").submit();
+            });
+        }
+    });
+</script>
