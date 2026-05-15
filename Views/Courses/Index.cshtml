@@ -2,51 +2,85 @@
 
 @{
     ViewBag.PageTitle = "Cours";
-    string search = ViewBag.Search != null ? ViewBag.Search.ToString() : "";
-    var sessions = Model.Select(c => c.Session).Distinct().OrderBy(s => s).ToList();
-}
 
-@if (Session["Search"] != null && (bool)Session["Search"])
-{
-    <form method="get" action="@Url.Action("Index", "Courses")">
-        <input type="text"
-               name="search"
-               value="@search"
-               class="form-control"
-               placeholder="Recherche..." />
-    </form>
+    var sessions = Model
+        .Select(c => c.Session)
+        .Distinct()
+        .OrderBy(s => s)
+        .ToList();
 }
 
 @foreach (var session in sessions)
 {
     <details open id="course_details_@session">
-        <summary>Session @session</summary>
 
-        @foreach (var course in Model.Where(c => c.Session == session).OrderBy(c => c.Code))
+        <summary>
+            Session @session
+        </summary>
+
+        @foreach (var course in Model
+            .Where(c => c.Session == session)
+            .OrderBy(c => c.Code))
         {
             <div class="CoursesListLayout">
+
                 <a href="@Url.Action("Details", "Courses", new { id = course.Id })">
-                    <span class="courseCode">@course.Code</span>
-                    <span>
-                        @if (!string.IsNullOrWhiteSpace(search))
-                        {
-                            @Html.Raw(course.Title.Replace(search, "<span class='highlight'>" + search + "</span>"))
-                        }
-                        else
-                        {
-                            @course.Title
-                        }
+
+                    <span class="courseCode courseSearchText">
+                        @course.Code
                     </span>
+
+                    <span class="courseSearchText">
+                        @course.Title
+                    </span>
+
                 </a>
+
             </div>
         }
+
     </details>
 }
 
 @section Scripts {
     <script>
+
+        function highlightCourses() {
+
+            let search = $("#searchInput").val();
+
+            $(".courseSearchText").each(function () {
+
+                let original = $(this).data("original");
+
+                if (!search) {
+                    $(this).html(original);
+                    return;
+                }
+
+                let safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+                let regex = new RegExp("(" + safeSearch + ")", "gi");
+
+                $(this).html(
+                    original.replace(
+                        regex,
+                        "<span class='highlight'>$1</span>"
+                    )
+                );
+            });
+        }
+
         $(() => {
+
             RestoreDetailsState();
+
+            $(".courseSearchText").each(function () {
+                $(this).data("original", $(this).html());
+            });
+
+            $("#searchInput").on("input", highlightCourses);
         });
+
     </script>
 }

@@ -1,37 +1,29 @@
 ﻿@model Models.Teacher
 
-<h2>Ajouter un enseignant</h2>
+@{
+    ViewBag.PageTitle = "Prof - Ajout";
+}
 
 @using (Html.BeginForm())
 {
-    <div class="form-group">
+    @Html.AntiForgeryToken()
+
+    <details open>
+        <summary>Informations</summary>
+
         <label>Prénom</label>
         @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
-    </div>
 
-    <div class="form-group">
         <label>Nom</label>
         @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
-    </div>
 
-    <div class="form-group">
-        <label>Téléphone</label>
-        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phoneExt" })
-    </div>
-
-    <div class="form-group">
         <label>Date d'embauche</label>
         @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control datepicker" })
-    </div>
 
-    <div class="form-group">
+        <label>Téléphone</label>
+        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phoneExt" })
+
         <label>Avatar</label>
         @Html.TextBoxFor(m => m.Avatar, new { @class = "form-control" })
-    </div>
-
-    <br />
-    <button type="submit" class="btn btn-primary">Ajouter</button>
+    </details>
 }
-
-<br />
-@Html.ActionLink("Retour", "Index")

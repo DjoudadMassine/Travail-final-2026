@@ -264,3 +264,9 @@ summary {
     padding: 7px;
     font-weight: bold;
 }
+.highlight {
+    background-color: yellow;
+    font-weight: bold;
+    padding: 1px 2px;
+    border-radius: 3px;
+}

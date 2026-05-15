@@ -1,29 +1,7 @@
 ﻿@model IEnumerable<Models.Teacher>
 
 @{
-    ViewBag.Title = "Enseignants";
-    bool searchVisible = Session["TeachersSearchVisible"] as bool? ?? false;
-}
-
-<h2>Liste des enseignants</h2>
-
-
-@if (searchVisible)
-{
-    <form method="get"
-          action="@Url.Action("Index", "Teachers")"
-          class="searchBar">
-
-        <input type="text"
-               name="search"
-               value="@ViewBag.Search"
-               class="searchInput"
-               placeholder="Rechercher un enseignant..." />
-
-        <button type="submit" class="searchButton">
-            Rechercher
-        </button>
-    </form>
+    ViewBag.PageTitle = "Profs";
 }
 
 @foreach (var teacher in Model)
@@ -39,15 +17,56 @@
                         border-radius:50%;
                         object-fit:cover;" />
 
-            <span class="teacherCode">
+            <span class="teacherCode teacherSearchText">
                 @teacher.Code
             </span>
 
-            <span>
+            <span class="teacherSearchText">
                 @teacher.LastName @teacher.FirstName
             </span>
 
         </div>
 
     </a>
+}
+
+@section Scripts {
+    <script>
+
+        function highlightTeachers() {
+
+            let search = $("#searchInput").val();
+
+            $(".teacherSearchText").each(function () {
+
+                let original = $(this).data("original");
+
+                if (!search) {
+                    $(this).html(original);
+                    return;
+                }
+
+                let safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+                let regex = new RegExp("(" + safeSearch + ")", "gi");
+
+                $(this).html(
+                    original.replace(
+                        regex,
+                        "<span class='highlight'>$1</span>"
+                    )
+                );
+            });
+        }
+
+        $(() => {
+
+            $(".teacherSearchText").each(function () {
+                $(this).data("original", $(this).html());
+            });
+
+            $("#searchInput").on("input", highlightTeachers);
+        });
+
+    </script>
 }

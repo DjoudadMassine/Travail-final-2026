@@ -9,7 +9,7 @@ namespace Models
     {
         public Allocation()
         {
-            Year = DateTime.Now.Year;
+            Year = NextSession.Year;
         }
 
         public int TeacherId { get; set; }

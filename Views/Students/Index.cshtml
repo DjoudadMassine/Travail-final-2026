@@ -1,48 +1,81 @@
 ﻿@model IEnumerable<Models.Student>
 
 @{
-    ViewBag.Title = "Étudiants";
-    bool searchVisible = Session["StudentsSearchVisible"] as bool? ?? false;
+    ViewBag.PageTitle = "Étudiants";
 }
 
-<h2>Liste des étudiants</h2>
+@{
+    var years = Model
+        .Select(s => s.Year)
+        .Distinct()
+        .OrderByDescending(y => y)
+        .ToList();
+}
 
-<p>
-    @Html.ActionLink("Ajouter un étudiant", "Create")
-</p>
-
-@if (searchVisible)
+@foreach (var year in years)
 {
-    <form method="get" action="@Url.Action("Index", "Students")" class="searchBar">
-        <input type="text"
-               name="search"
-               class="searchInput"
-               placeholder="Rechercher un étudiant..." />
+    <details open id="student_details_@year">
 
-        <button type="submit" class="searchButton">
-            Rechercher
-        </button>
-    </form>
+        <summary>
+            Cohorte @year
+        </summary>
+
+        @foreach (var student in Model.Where(s => s.Year == year))
+        {
+            <div class="StudentListLayout"
+                 onclick="window.location='@Url.Action("Details", "Students", new { id = student.Id })'">
+
+                <div class="studentCode studentSearchText">
+                    @student.Code
+                </div>
+
+                <div class="studentSearchText">
+                    @student.FullName
+                </div>
+
+            </div>
+        }
+
+    </details>
 }
 
-<div>
-    <div class="StudentListLayout">
-        <div><strong>Code</strong></div>
-        <div><strong>Nom</strong></div>
-        <div><strong>Courriel</strong></div>
-    </div>
+@section Scripts {
+    <script>
+        function highlightStudents() {
 
-    @foreach (var student in Model)
-    {
-        <div class="StudentListLayout"
-             onclick="window.location='@Url.Action("Details", "Students", new { id = student.Id })'">
+            let search = $("#searchInput").val();
 
-            <div class="studentCode">@student.Code</div>
+            $(".studentSearchText").each(function () {
 
-            <div>@student.FullName</div>
+                let original = $(this).data("original");
 
-            <div>@student.Email</div>
+                if (!search) {
+                    $(this).html(original);
+                    return;
+                }
 
-        </div>
-    }
-</div>
+                let safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+                let regex = new RegExp("(" + safeSearch + ")", "gi");
+
+                $(this).html(
+                    original.replace(
+                        regex,
+                        "<span class='highlight'>$1</span>"
+                    )
+                );
+            });
+        }
+
+        $(() => {
+
+            RestoreDetailsState();
+
+            $(".studentSearchText").each(function () {
+                $(this).data("original", $(this).html());
+            });
+
+            $("#searchInput").on("input", highlightStudents);
+        });
+    </script>
+}

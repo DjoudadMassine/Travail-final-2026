@@ -3,60 +3,60 @@ using Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web.ModelBinding;
 using System.Web.Mvc;
 
 namespace LionelGroulx.Controllers
 {
     public class StudentsController : Controller
     {
-        // GET: Students
         public ActionResult Index(string search)
         {
-            var students = DB.Students.ToList();
+            ViewBag.PageTitle = "Étudiants";
+
+            List<Student> students = DB.Students.ToList();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                search = search.ToLower();
+                string s = search.ToLower();
 
                 students = students
-                    .Where(s =>
-                        (s.Code != null && s.Code.ToLower().Contains(search)) ||
-                        (s.FirstName != null && s.FirstName.ToLower().Contains(search)) ||
-                        (s.LastName != null && s.LastName.ToLower().Contains(search)) ||
-                        (s.Email != null && s.Email.ToLower().Contains(search))
-                    )
+                    .Where(st =>
+                        (st.Code != null && st.Code.ToLower().Contains(s)) ||
+                        (st.FirstName != null && st.FirstName.ToLower().Contains(s)) ||
+                        (st.LastName != null && st.LastName.ToLower().Contains(s)) ||
+                        (st.Email != null && st.Email.ToLower().Contains(s)))
                     .ToList();
             }
 
-            string sortBy = Session["StudentsSortBy"] as string ?? "Date";
-            bool descending = Session["StudentsSortDescending"] as bool? ?? true;
-
-            if (sortBy == "Title")
-            {
-                students = descending
-                    ? students.OrderByDescending(s => s.LastName).ThenByDescending(s => s.FirstName).ToList()
-                    : students.OrderBy(s => s.LastName).ThenBy(s => s.FirstName).ToList();
-            }
-            else
-            {
-                students = descending
-                    ? students.OrderByDescending(s => s.Year).ThenByDescending(s => s.Code).ToList()
-                    : students.OrderBy(s => s.Year).ThenBy(s => s.Code).ToList();
-            }
+            students = students
+                .OrderByDescending(st => st.Year)
+                .ThenBy(st => st.LastName)
+                .ThenBy(st => st.FirstName)
+                .ToList();
 
             ViewBag.Search = search;
 
             return View(students);
         }
+
         public ActionResult ToggleSearch()
         {
-            Session["StudentsSearchVisible"] =
-                !(Session["StudentsSearchVisible"] as bool? ?? false);
-
+            Session["Search"] = !(Session["Search"] as bool? ?? false);
             return RedirectToAction("Index");
         }
-        // GET: Students/Details/5
+
+        public ActionResult ToggleSort()
+        {
+            Session["SortAscending"] = !(Session["SortAscending"] as bool? ?? false);
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult SetSortBy(string sortBy)
+        {
+            Session["StudentsSortBy"] = sortBy;
+            return RedirectToAction("Index");
+        }
+
         public ActionResult Details(int id)
         {
             Student student = DB.Students.Get(id);
@@ -64,32 +64,30 @@ namespace LionelGroulx.Controllers
             if (student == null)
                 return RedirectToAction("Index");
 
+            ViewBag.PageTitle = "Étudiant - Détails";
+
             return View(student);
         }
-
-        // GET: Students/Create
+     
         public ActionResult Create()
         {
+            ViewBag.PageTitle = "Étudiant - Ajout";
             return View();
         }
 
-        // POST: Students/Create
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(Student student)
         {
-            if (ModelState.IsValid)
-            {
-                // génération du code étudiant
-                student.Code = GenerateStudentCode();
-
-                DB.Students.Add(student);
-
+            if (student == null)
                 return RedirectToAction("Index");
-            }
 
-            return View(student);
+            student.Code = GenerateStudentCode();
+
+            DB.Students.Add(student);
+
+            return RedirectToAction("Index");
         }
-
 
         public ActionResult Edit(int id)
         {
@@ -98,83 +96,59 @@ namespace LionelGroulx.Controllers
             if (student == null)
                 return RedirectToAction("Index");
 
-            var allCourses = DB.Courses.ToList();
+            ViewBag.PageTitle = "Étudiant - Modification";
 
-            var registrations = DB.Registrations.ToList()
-                .Where(r => r.StudentId == student.Id)
-                .ToList();
+            ViewBag.Registrations = student.NextSessionCoursesToSelectList;
 
-            var studentCourses = registrations
-                .Select(r => r.Course)
-                .ToList();
-
-            var availableCourses = allCourses
-                .Where(c => !studentCourses.Any(sc => sc.Id == c.Id))
-                .ToList();
-
-            ViewBag.StudentCourses = studentCourses;
-            ViewBag.AvailableCourses = availableCourses;
+            ViewBag.Courses = SelectListUtilities<Course>.Convert(
+                DB.Courses.ToList()
+                    .Where(c => NextSession.ValidSessions.Contains(c.Session))
+                    .ToList(),
+                "Caption"
+            );
 
             return View(student);
         }
 
-        // POST: Students/Edit/5
         [HttpPost]
-        public ActionResult Edit(Student student, int[] coursesToAdd)
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Student student, List<int> selectedCoursesId)
         {
-            if (ModelState.IsValid)
-            {
-                DB.Students.Update(student);
+            Student storedStudent = DB.Students.Get(student.Id);
 
-                if (coursesToAdd != null)
-                {
-                    foreach (int courseId in coursesToAdd)
-                    {
-                        Registration registration = new Registration();
-                        registration.StudentId = student.Id;
-                        registration.CourseId = courseId;
+            if (storedStudent == null)
+                return RedirectToAction("Index");
 
-                        DB.Registrations.Add(registration);
-                    }
-                }
+            student.Code = storedStudent.Code;
 
-                return RedirectToAction("Edit", new { id = student.Id });
-            }
+            DB.Students.Update(student);
 
-            return View(student);
+            student.UpdateRegistrations(selectedCoursesId);
+
+            return RedirectToAction("Details", new { id = student.Id });
         }
 
-        // GET: Students/Delete/5
         public ActionResult Delete(int id)
         {
-            DB.Students.Delete(id);
+            Student student = DB.Students.Get(id);
+
+            if (student != null)
+            {
+                student.DeleteAllRegistrations();
+                DB.Students.Delete(id);
+            }
 
             return RedirectToAction("Index");
         }
-        public ActionResult ToggleSort()
-        {
-            bool descending = Session["StudentsSortDescending"] as bool? ?? false;
-            Session["StudentsSortDescending"] = !descending;
 
-            return RedirectToAction("Index");
-        }
-
-        public ActionResult SetSortBy(string sortBy)
-        {
-            Session["StudentsSortBy"] = sortBy;
-
-            return RedirectToAction("Index");
-        }
         private string GenerateStudentCode()
         {
             Random random = new Random();
-
             string code;
 
             do
             {
-                code = System.DateTime.Now.Year.ToString()
-                    + random.Next(100000, 999999).ToString();
+                code = DateTime.Now.Year.ToString() + random.Next(100000, 999999).ToString();
             }
             while (DB.Students.ToList().Any(s => s.Code == code));
 
