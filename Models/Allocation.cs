@@ -23,5 +23,12 @@ namespace Models
 
         [JsonIgnore]
         public Course Course => DB.Courses.Get(CourseId);
+
+
+        [JsonIgnore]
+        public bool IsNextSession =>
+           Course != null &&
+           Year == NextSession.Year &&
+           NextSession.ValidSessions.Contains(Course.Session);
     }
 }

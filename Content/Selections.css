@@ -57,7 +57,10 @@
 
     .VerSelectionsCMD {
         display: flex;
-       
+        flex-direction: row !important;
+        justify-content: center;
+        gap: 10px;
+        margin: 10px 0;
     }
 }
 
@@ -65,4 +68,11 @@ select option {
 
     text-overflow: ellipsis;
     overflow: hidden;
+}
+.AddSelection,
+.RemoveSelection,
+.UnselectAll {
+    cursor: pointer;
+    font-size: 24px;
+    color: dodgerblue;
 }

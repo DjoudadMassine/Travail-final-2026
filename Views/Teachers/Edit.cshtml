@@ -1,40 +1,77 @@
 ﻿@model Models.Teacher
 
-<h2>Modifier un enseignant</h2>
+@{
+    ViewBag.PageTitle = "Prof - Modification";
+}
 
 @using (Html.BeginForm())
 {
+    @Html.AntiForgeryToken()
+
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.Code)
+    @Html.HiddenFor(m => m.Avatar)
 
-    <div class="form-group">
+    <fieldset>
+        <legend>Informations</legend>
+
         <label>Prénom</label>
         @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
-    </div>
 
-    <div class="form-group">
         <label>Nom</label>
         @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
-    </div>
 
-    <div class="form-group">
-        <label>Téléphone</label>
-        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phoneExt" })
-    </div>
-
-    <div class="form-group">
         <label>Date d'embauche</label>
         @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control datepicker" })
-    </div>
 
-    <div class="form-group">
+        <label>Téléphone</label>
+        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control phoneExt" })
+
         <label>Avatar</label>
-        @Html.TextBoxFor(m => m.Avatar, new { @class = "form-control" })
-    </div>
+        <br />
+        <img src="@Model.Avatar"
+             style="width:350px; height:350px; object-fit:cover; border-radius:8px;" />
+    </fieldset>
 
-    <br />
-    <button type="submit" class="btn btn-success">Sauvegarder</button>
+    <details open>
+        <summary>Allocation : @Models.NextSession.Caption</summary>
+
+        @Helper.SelectionLists(
+            "selectedCoursesId",
+            (System.Web.Mvc.SelectList)ViewBag.SelectedCourses,
+            (System.Web.Mvc.SelectList)ViewBag.Courses
+        )
+    </details>
 }
+@section Scripts {
+    <script>
+        $(document).ready(function () {
 
-<br />
-@Html.ActionLink("Retour", "Index")
+            $(".AddSelection").off("click").on("click", function () {
+                let parent = $(this).closest(".selectionsGrid");
+
+                parent.find(".UnselectedItems option:selected").each(function () {
+                    parent.find(".SelectedItems").append($(this));
+                });
+            });
+
+            $(".RemoveSelection").off("click").on("click", function () {
+                let parent = $(this).closest(".selectionsGrid");
+
+                parent.find(".SelectedItems option:selected").each(function () {
+                    parent.find(".UnselectedItems").append($(this));
+                });
+            });
+
+            $(".UnselectAll").off("click").on("click", function () {
+                let parent = $(this).closest(".selectionsGrid");
+
+                parent.find("option").prop("selected", false);
+            });
+
+            $("form").on("submit", function () {
+                $(".SelectedItems option").prop("selected", true);
+            });
+        });
+    </script>
+}

@@ -1,19 +1,60 @@
 ﻿@model Models.Teacher
 
-<h2>Détails enseignant</h2>
+@{
+    ViewBag.PageTitle = "Prof - Détails";
 
-<div class="UserMediumAvatar"
-     style="background:url('@Model.Avatar'); background-size:cover; background-position:center;">
-</div>
+    var allocations = DAL.DB.Allocations.ToList()
+        .Where(a => a.TeacherId == Model.Id && a.Course != null)
+        .OrderByDescending(a => a.Year)
+        .ThenBy(a => a.Course.Session)
+        .ThenBy(a => a.Course.Code)
+        .ToList();
+
+    var years = allocations
+        .Select(a => a.Year)
+        .Distinct()
+        .OrderByDescending(y => y)
+        .ToList();
+}
+
+<details open>
+    <summary>
+        <i class="fa fa-user"></i>
+        @Model.FirstName @Model.LastName
+    </summary>
+
+    <p><i class="fa fa-barcode"></i> @Model.Code</p>
+    <p><i class="fa fa-phone"></i> @Model.Phone</p>
+
+    <p>
+        Embauché le @Model.StartDate.ToString("dd MMMM yyyy")<br />
+        @(DateTime.Now.Year - Model.StartDate.Year) ans d'ancienneté
+    </p>
+
+    @Helper.Image(Model.Avatar, "UserSmallAvatar")
+</details>
 
 <hr />
 
-<p><strong>Code :</strong> @Model.Code</p>
-<p><strong>Nom :</strong> @Model.LastName @Model.FirstName</p>
-<p><strong>Téléphone :</strong> @Model.Phone</p>
-<p><strong>Date d'embauche :</strong> @Model.StartDate.ToString("yyyy-MM-dd")</p>
+<h3>Allocations</h3>
 
-<p>
-    @Html.ActionLink("Modifier", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Retour", "Index")
-</p>
+@foreach (var year in years)
+{
+    <details open id="teacher_details_@year">
+        <summary>@year</summary>
+
+        @foreach (var allocation in allocations.Where(a => a.Year == year))
+        {
+            <div>
+                [@allocation.Course.Session]
+                @Html.ActionLink(
+                    allocation.Course.Code + " " + allocation.Course.Title,
+                    "Details",
+                    "Courses",
+                    new { id = allocation.Course.Id },
+                    null
+                )
+            </div>
+        }
+    </details>
+}

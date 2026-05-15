@@ -8,15 +8,15 @@ namespace LionelGroulx
         public static void RegisterBundles(BundleCollection bundles)
         {
             bundles.Add(new ScriptBundle("~/bundles/scripts").Include(
-                            "~/Scripts/validation.js",
-                            "~/Scripts/jquery-maskedinput.js",
-                            "~/Scripts/bootbox.js",
-                            "~/Scripts/selection.js",
-                            "~/Scripts/SiteScripts.js",
-                            "~/Scripts/session.js",
-                            "~/Scripts/SiteNotificationsHandler.js",
-                            "~/Scripts/autoRefreshPanel.js",
-                            "~/Scripts/image-control.js"));
+                "~/Scripts/validation.js",
+                "~/Scripts/jquery-maskedinput.js",
+                "~/Scripts/bootbox.js",
+                "~/Scripts/selection.js",
+                "~/Scripts/SiteScripts.js",
+                "~/Scripts/session.js",
+                "~/Scripts/autoRefreshPanel.js",
+                "~/Scripts/image-control.js"
+            ));
 
             bundles.Add(new StyleBundle("~/Content/css").Include(
            "~/Content/_layout.css",

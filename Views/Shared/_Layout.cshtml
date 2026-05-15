@@ -24,7 +24,12 @@
                 @RenderBody()
             </div>
         </div>
-
+        <div class="roundedBorder" style="margin-top:5px;">
+            <a href="/NextSession/Edit"
+               style="text-decoration:none; color:black; font-weight:bold; display:block;">
+                @Models.NextSession.Caption
+            </a>
+        </div>
         <div id="footerPanel" class="section roundedBorder footerPanel">
             &copy; @DateTime.Now.Year - Gooniversité
             <img src="/updatingView.gif"

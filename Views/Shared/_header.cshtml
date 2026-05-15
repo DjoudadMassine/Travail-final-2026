@@ -223,10 +223,23 @@
                 break;
 
             case "edit":
-                <div id="mainMenuPanel" class="menu">
-                    <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.querySelector('form').submit()"></i>
-                    <a href="/@controller/Details/@id" class="cmdIcon fa fa-square-xmark" title="Annuler"></a>
-                </div>
+    <div id="mainMenuPanel" class="menu">
+        <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.querySelector('form').submit()"></i>
+        @if (controller == "nextsession")
+        {
+            <a href="/Students"
+               class="cmdIcon fa fa-square-xmark"
+               title="Annuler">
+            </a>
+        }
+        else
+        {
+            <a href="/@controller/Details/@id"
+               class="cmdIcon fa fa-square-xmark"
+               title="Annuler">
+            </a>
+        }
+    </div>
                 break;
 
             case "loginsjournal":

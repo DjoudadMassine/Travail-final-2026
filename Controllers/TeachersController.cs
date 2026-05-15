@@ -1,6 +1,7 @@
 ﻿using DAL;
 using Models;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -10,37 +11,28 @@ namespace LionelGroulx.Controllers
     {
         public ActionResult Index(string search)
         {
-            var teachers = DB.Teachers.ToList();
+            ViewBag.PageTitle = "Profs";
+
+            List<Teacher> teachers = DB.Teachers.ToList();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                search = search.ToLower();
+                string s = search.ToLower();
 
                 teachers = teachers
                     .Where(t =>
-                        (t.Code != null && t.Code.ToLower().Contains(search)) ||
-                        (t.FirstName != null && t.FirstName.ToLower().Contains(search)) ||
-                        (t.LastName != null && t.LastName.ToLower().Contains(search)) ||
-                        (t.Email != null && t.Email.ToLower().Contains(search))
+                        (t.Code != null && t.Code.ToLower().Contains(s)) ||
+                        (t.FirstName != null && t.FirstName.ToLower().Contains(s)) ||
+                        (t.LastName != null && t.LastName.ToLower().Contains(s)) ||
+                        (t.Phone != null && t.Phone.ToLower().Contains(s))
                     )
                     .ToList();
             }
 
-            string sortBy = Session["TeachersSortBy"] as string ?? "Title";
-            bool descending = Session["TeachersSortDescending"] as bool? ?? false;
-
-            if (sortBy == "Date")
-            {
-                teachers = descending
-                    ? teachers.OrderByDescending(t => t.Code).ToList()
-                    : teachers.OrderBy(t => t.Code).ToList();
-            }
-            else
-            {
-                teachers = descending
-                    ? teachers.OrderByDescending(t => t.LastName).ThenByDescending(t => t.FirstName).ToList()
-                    : teachers.OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToList();
-            }
+            teachers = teachers
+                .OrderBy(t => t.LastName)
+                .ThenBy(t => t.FirstName)
+                .ToList();
 
             ViewBag.Search = search;
 
@@ -49,24 +41,19 @@ namespace LionelGroulx.Controllers
 
         public ActionResult ToggleSearch()
         {
-            Session["TeachersSearchVisible"] =
-                !(Session["TeachersSearchVisible"] as bool? ?? false);
-
+            Session["Search"] = !(Session["Search"] as bool? ?? false);
             return RedirectToAction("Index");
         }
 
         public ActionResult ToggleSort()
         {
-            bool descending = Session["TeachersSortDescending"] as bool? ?? false;
-            Session["TeachersSortDescending"] = !descending;
-
+            Session["SortAscending"] = !(Session["SortAscending"] as bool? ?? false);
             return RedirectToAction("Index");
         }
 
         public ActionResult SetSortBy(string sortBy)
         {
             Session["TeachersSortBy"] = sortBy;
-
             return RedirectToAction("Index");
         }
 
@@ -77,27 +64,29 @@ namespace LionelGroulx.Controllers
             if (teacher == null)
                 return RedirectToAction("Index");
 
+            ViewBag.PageTitle = "Prof - Détails";
+
             return View(teacher);
         }
 
         public ActionResult Create()
         {
+            ViewBag.PageTitle = "Prof - Ajout";
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(Teacher teacher)
         {
-            if (ModelState.IsValid)
-            {
-                teacher.Code = GenerateTeacherCode();
-
-                DB.Teachers.Add(teacher);
-
+            if (teacher == null)
                 return RedirectToAction("Index");
-            }
 
-            return View(teacher);
+            teacher.Code = GenerateTeacherCode();
+
+            DB.Teachers.Add(teacher);
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult Edit(int id)
@@ -107,24 +96,86 @@ namespace LionelGroulx.Controllers
             if (teacher == null)
                 return RedirectToAction("Index");
 
+            ViewBag.PageTitle = "Prof - Modification";
+
+            var selectedCourses = DB.Allocations.ToList()
+                .Where(a =>
+                    a.TeacherId == teacher.Id &&
+                    a.Course != null &&
+                    a.Year == NextSession.Year &&
+                    NextSession.ValidSessions.Contains(a.Course.Session)
+                )
+                .Select(a => a.Course)
+                .ToList();
+
+            var allNextSessionCourses = DB.Courses.ToList()
+                .Where(c => NextSession.ValidSessions.Contains(c.Session))
+                .OrderBy(c => c.Session)
+                .ThenBy(c => c.Code)
+                .ToList();
+
+            ViewBag.SelectedCourses = SelectListUtilities<Course>.Convert(selectedCourses, "Caption");
+            ViewBag.Courses = SelectListUtilities<Course>.Convert(allNextSessionCourses, "Caption");
+
             return View(teacher);
         }
-
         [HttpPost]
-        public ActionResult Edit(Teacher teacher)
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Teacher teacher, List<int> selectedCoursesId)
         {
-            if (ModelState.IsValid)
-            {
-                DB.Teachers.Update(teacher);
+            Teacher storedTeacher = DB.Teachers.Get(teacher.Id);
 
-                return RedirectToAction("Details", new { id = teacher.Id });
+            if (storedTeacher == null)
+                return RedirectToAction("Index");
+
+            teacher.Code = storedTeacher.Code;
+
+            if (string.IsNullOrEmpty(teacher.Avatar))
+                teacher.Avatar = storedTeacher.Avatar;
+
+            DB.Teachers.Update(teacher);
+
+            var oldAllocations = DB.Allocations.ToList()
+                .Where(a =>
+                    a.TeacherId == teacher.Id &&
+                    a.Course != null &&
+                    a.Year == NextSession.Year &&
+                    NextSession.ValidSessions.Contains(a.Course.Session)
+                )
+                .ToList();
+
+            foreach (var allocation in oldAllocations)
+            {
+                DB.Allocations.Delete(allocation.Id);
             }
 
-            return View(teacher);
+            if (selectedCoursesId != null)
+            {
+                foreach (int courseId in selectedCoursesId)
+                {
+                    DB.Allocations.Add(new Allocation
+                    {
+                        TeacherId = teacher.Id,
+                        CourseId = courseId,
+                        Year = NextSession.Year
+                    });
+                }
+            }
+
+            return RedirectToAction("Details", new { id = teacher.Id });
         }
 
         public ActionResult Delete(int id)
         {
+            List<Allocation> allocations = DB.Allocations.ToList()
+                .Where(a => a.TeacherId == id)
+                .ToList();
+
+            foreach (Allocation allocation in allocations)
+            {
+                DB.Allocations.Delete(allocation.Id);
+            }
+
             DB.Teachers.Delete(id);
 
             return RedirectToAction("Index");
@@ -133,7 +184,6 @@ namespace LionelGroulx.Controllers
         private string GenerateTeacherCode()
         {
             Random random = new Random();
-
             string code;
 
             do
