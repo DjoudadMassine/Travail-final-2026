@@ -25,11 +25,11 @@
             <div class="StudentListLayout"
                  onclick="window.location='@Url.Action("Details", "Students", new { id = student.Id })'">
 
-                <div class="studentCode studentSearchText">
+                <div class="studentCode searchable">
                     @student.Code
                 </div>
 
-                <div class="studentSearchText">
+                <div class="searchable">
                     @student.FullName
                 </div>
 
@@ -41,29 +41,22 @@
 
 @section Scripts {
     <script>
-        function highlightStudents() {
+
+        function refreshStudentHighlight() {
 
             let search = $("#searchInput").val();
 
-            $(".studentSearchText").each(function () {
+            $(".searchable").each(function () {
 
-                let original = $(this).data("original");
-
-                if (!search) {
-                    $(this).html(original);
-                    return;
+                if ($(this).data("original") == null) {
+                    $(this).data("original", $(this).html());
                 }
 
-                let safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                $(this).html($(this).data("original"));
 
-                let regex = new RegExp("(" + safeSearch + ")", "gi");
-
-                $(this).html(
-                    original.replace(
-                        regex,
-                        "<span class='highlight'>$1</span>"
-                    )
-                );
+                if (search && search.trim() !== "") {
+                    highlight(search.toLowerCase(), this);
+                }
             });
         }
 
@@ -71,11 +64,11 @@
 
             RestoreDetailsState();
 
-            $(".studentSearchText").each(function () {
-                $(this).data("original", $(this).html());
+            $("#searchInput").on("input", function () {
+                refreshStudentHighlight();
             });
 
-            $("#searchInput").on("input", highlightStudents);
         });
+
     </script>
 }

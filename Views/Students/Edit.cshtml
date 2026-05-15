@@ -21,7 +21,10 @@
         @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
 
         <label>Date de naissance</label>
-        @Html.TextBoxFor(m => m.BirthDate, "{0:yyyy-MM-dd}", new { @class = "form-control datepicker" })
+        @Html.TextBoxFor(
+            m => m.BirthDate,
+            "{0:yyyy-MM-dd}",
+            new { @class = "form-control datepicker" })
 
         <label>Courriel</label>
         @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
@@ -39,28 +42,4 @@
             (System.Web.Mvc.SelectList)ViewBag.Courses
         )
     </details>
-}
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $(".AddSelection").off("click").on("click", function () {
-                let parent = $(this).closest(".selectionsGrid");
-                parent.find(".UnselectedItems option:selected").each(function () {
-                    parent.find(".SelectedItems").append($(this));
-                });
-            });
-
-            $(".RemoveSelection").off("click").on("click", function () {
-                let parent = $(this).closest(".selectionsGrid");
-                parent.find(".SelectedItems option:selected").each(function () {
-                    parent.find(".UnselectedItems").append($(this));
-                });
-            });
-
-            $("form").on("submit", function () {
-                $(".SelectedItems option").prop("selected", true);
-            });
-        });
-    </script>
 }

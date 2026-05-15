@@ -17,11 +17,11 @@
                         border-radius:50%;
                         object-fit:cover;" />
 
-            <span class="teacherCode teacherSearchText">
+            <span class="teacherCode searchable">
                 @teacher.Code
             </span>
 
-            <span class="teacherSearchText">
+            <span class="searchable">
                 @teacher.LastName @teacher.FirstName
             </span>
 
@@ -33,39 +33,30 @@
 @section Scripts {
     <script>
 
-        function highlightTeachers() {
+        function refreshTeacherHighlight() {
 
             let search = $("#searchInput").val();
 
-            $(".teacherSearchText").each(function () {
+            $(".searchable").each(function () {
 
-                let original = $(this).data("original");
-
-                if (!search) {
-                    $(this).html(original);
-                    return;
+                if ($(this).data("original") == null) {
+                    $(this).data("original", $(this).html());
                 }
 
-                let safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                $(this).html($(this).data("original"));
 
-                let regex = new RegExp("(" + safeSearch + ")", "gi");
-
-                $(this).html(
-                    original.replace(
-                        regex,
-                        "<span class='highlight'>$1</span>"
-                    )
-                );
+                if (search && search.trim() !== "") {
+                    highlight(search.toLowerCase(), this);
+                }
             });
         }
 
         $(() => {
 
-            $(".teacherSearchText").each(function () {
-                $(this).data("original", $(this).html());
+            $("#searchInput").on("input", function () {
+                refreshTeacherHighlight();
             });
 
-            $("#searchInput").on("input", highlightTeachers);
         });
 
     </script>

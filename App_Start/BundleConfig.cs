@@ -11,7 +11,7 @@ namespace LionelGroulx
                 "~/Scripts/validation.js",
                 "~/Scripts/jquery-maskedinput.js",
                 "~/Scripts/bootbox.js",
-                "~/Scripts/selection.js",
+                "~/Scripts/selections.js",
                 "~/Scripts/SiteScripts.js",
                 "~/Scripts/session.js",
                 "~/Scripts/autoRefreshPanel.js",

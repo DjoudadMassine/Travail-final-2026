@@ -43,35 +43,3 @@
         )
     </details>
 }
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-
-            $(".AddSelection").off("click").on("click", function () {
-                let parent = $(this).closest(".selectionsGrid");
-
-                parent.find(".UnselectedItems option:selected").each(function () {
-                    parent.find(".SelectedItems").append($(this));
-                });
-            });
-
-            $(".RemoveSelection").off("click").on("click", function () {
-                let parent = $(this).closest(".selectionsGrid");
-
-                parent.find(".SelectedItems option:selected").each(function () {
-                    parent.find(".UnselectedItems").append($(this));
-                });
-            });
-
-            $(".UnselectAll").off("click").on("click", function () {
-                let parent = $(this).closest(".selectionsGrid");
-
-                parent.find("option").prop("selected", false);
-            });
-
-            $("form").on("submit", function () {
-                $(".SelectedItems option").prop("selected", true);
-            });
-        });
-    </script>
-}
