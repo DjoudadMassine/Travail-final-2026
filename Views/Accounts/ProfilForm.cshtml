@@ -1,11 +1,12 @@
-﻿
-@model Models.User
+﻿@model Models.User
+
 @{
     bool subscribing = Model.Id == 0;
     string notifyValue = Model.Notify ? "checked" : "";
     string access = "";
     string accessIcon = "";
     bool userConnected = Models.User.ConnectedUser != null;
+
     if (userConnected)
     {
         switch (Models.User.ConnectedUser.Access)
@@ -14,10 +15,12 @@
                 accessIcon = "/Content/UI-Images/user.png";
                 access = "Lecture seule";
                 break;
+
             case Models.Access.Write:
                 accessIcon = "/Content/UI-Images/power_user.png";
                 access = "Lecture/Écriture";
                 break;
+
             case Models.Access.Admin:
                 accessIcon = "/Content/UI-Images/admin.png";
                 access = "Administrateur";
@@ -29,6 +32,7 @@
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
+
     if (access != "")
     {
         <fieldset>
@@ -39,20 +43,24 @@
             </div>
         </fieldset>
     }
+
     <fieldset>
         <legend>Nom</legend>
-        <input name="Name" id="Name"
+        <input name="Name"
+               id="Name"
                class="form-control Alpha"
                placeholder="Nom"
                required
-               RequireMessage="Veuillez entrer votre adresse de courriel"
+               RequireMessage="Veuillez entrer votre nom"
                InvalidMessage="Caractère illégal"
                value="@Model.Name" />
-
     </fieldset>
+
     <fieldset>
         <legend>Courriel</legend>
-        <input name="Email" id="Email"
+
+        <input name="Email"
+               id="Email"
                class="form-control Email"
                placeholder="Courriel"
                required
@@ -60,6 +68,7 @@
                InvalidMessage="Courriel invalide"
                CustomErrorMessage="Ce courriel est déjà utilisé!"
                value="@Model.Email" />
+
         <input id="ConfirmEmail"
                matchedInputId="Email"
                class="form-control MatchedInput"
@@ -69,26 +78,33 @@
                InvalidMessage="Les courriels ne correspondent pas"
                value="@Model.Email" />
     </fieldset>
+
     <fieldset>
         <legend>Mot de passe</legend>
-        <div style="display:grid; grid-template-columns:auto 15px; gap:6px">
-            @if (!subscribing)
-            {
-                <label for="changePassword" class="" style="text-align:right;">Modifier</label>
+
+        @if (!subscribing)
+        {
+            <div style="display:grid; grid-template-columns:auto 15px; gap:6px">
+                <label for="changePassword" style="text-align:right;">Modifier</label>
                 <input type="checkbox" name="changePassword" id="changePassword" />
-            }
-        </div>
+            </div>
+        }
 
         <div class="passwordLayout">
-            <input name="Password" id="Password"
+            <input name="Password"
+                   id="Password"
                    class="form-control"
                    type="password"
                    placeholder="Mot de passe"
                    required
                    RequireMessage="Veuillez entrer votre mot de passe" />
-            <i id="toggleShowPassword" class="passwordShowIcon fa fa-eye" title="Afficher/Masquer le mot de passe"></i>
 
+            <i id="toggleShowPassword"
+               class="passwordShowIcon fa fa-eye"
+               title="Afficher/Masquer le mot de passe">
+            </i>
         </div>
+
         <div class="passwordLayout">
             <input id="ConfirmPassword"
                    matchedInputId="Password"
@@ -97,20 +113,38 @@
                    placeholder="Confirmation"
                    required
                    RequireMessage="Veuillez confirmer votre mot de passe"
-                   InvalidMessage="Les mots de passse ne correspondent pas" />
+                   InvalidMessage="Les mots de passe ne correspondent pas" />
         </div>
-    </fieldset>
-    <fieldset>
-        <legend>Notifications</legend>
-        <div style="text-align:left; display: grid; grid-template-columns:15px 10px auto">
-            <input type="checkbox" name="NotifyCB" id="NotifyCB" @notifyValue />
-            <label for="NotifyCB" style="margin-left:4px">Activées</label>
-        </div>
-    </fieldset>
-    <fieldset>
-        <legend>Avatar</legend>
-        @Helper.ImageUploader("Avatar", Model.Avatar, "Cliquez glisser une photo")
     </fieldset>
 
-    <input type="submit" id="submit" style="display:none" />
+    <fieldset>
+        <legend>Notifications</legend>
+        <div style="text-align:left; display:grid; grid-template-columns:15px auto; gap:6px">
+            <input type="checkbox"
+                   name="NotifyCB"
+                   id="NotifyCB"
+                   @notifyValue />
+
+            <label for="NotifyCB">
+                Activées
+            </label>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Avatar</legend>
+
+        @Html.HiddenFor(m => m.Avatar)
+
+        @Helper.ImageUploader(
+            "Avatar",
+            string.IsNullOrEmpty(Model.Avatar) ? "/WebApp.png" : Model.Avatar,
+            "Cliquez glisser une photo"
+        )
+    </fieldset>
+
+    <input type="submit"
+           id="submit"
+           value="Soumettre"
+           style="display:none;" />
 }

@@ -1,4 +1,5 @@
 ﻿using DAL;
+using EmailHandling;
 using Models;
 using System.Linq;
 using System.Web.Mvc;
@@ -121,21 +122,55 @@ namespace LionelGroulx.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Subscribe(Models.User user)
+        public ActionResult Subscribe(Models.User user, string NotifyCB = "off")
         {
             if (user == null)
                 return View(new Models.User());
 
+            user.Notify = NotifyCB == "on";
             user.Access = Access.View;
             user.Blocked = false;
-            user.Verified = true;
+            user.Verified = false;
             user.Online = false;
 
+            Models.User.ConnectedUser = user;
             DB.Users.Add(user);
+            Models.User.ConnectedUser = null;
 
-            return Redirect(
-                "/Accounts/Login?message=Compte créé avec succès&success=true"
+            AccountsEmailing.SendEmailVerification(
+                Url.Action("VerifyUser", "Accounts", null, Request.Url.Scheme),
+                user
             );
+
+            return Redirect("/Accounts/Login?message=Création de compte effectuée avec succès! Un courriel de confirmation vous a été envoyé.&success=true");
+        }
+        public ActionResult VerifyUser(string code)
+        {
+            UnverifiedEmail unverifiedEmail = DB.UnverifiedEmails.ToList()
+                .FirstOrDefault(u => u.VerificationCode == code);
+
+            if (unverifiedEmail != null)
+            {
+                Models.User user = DB.Users.Get(unverifiedEmail.UserId);
+
+                DB.UnverifiedEmails.Delete(unverifiedEmail.Id);
+
+                if (user != null)
+                {
+                    user.Verified = true;
+                    Session["CurrentLoginEmail"] = user.Email;
+                    DB.Users.Update(user);
+
+                    AccountsEmailing.SendEmailUserStatusChanged(
+                        "Votre adresse de courriel a été confirmée.",
+                        user
+                    );
+
+                    return Redirect("/Accounts/Login?message=Votre adresse de courriel a été vérifiée avec succès!&success=true");
+                }
+            }
+
+            return Redirect("/Accounts/Login?message=Erreur de vérification de courriel!&success=false");
         }
 
         public ActionResult EditProfil()
