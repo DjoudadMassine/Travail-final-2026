@@ -98,24 +98,42 @@ namespace LionelGroulx.Controllers
 
             ViewBag.PageTitle = "Prof - Modification";
 
-            var selectedCourses = DB.Allocations.ToList()
+            List<int> selectedCourseIds = DB.Allocations.ToList()
                 .Where(a =>
                     a.TeacherId == teacher.Id &&
                     a.Course != null &&
                     a.Year == NextSession.Year &&
                     NextSession.ValidSessions.Contains(a.Course.Session)
                 )
-                .Select(a => a.Course)
+                .Select(a => a.CourseId)
                 .ToList();
 
-            var allNextSessionCourses = DB.Courses.ToList()
-                .Where(c => NextSession.ValidSessions.Contains(c.Session))
+            List<int> coursesAlreadyGivenToOtherTeachers = DB.Allocations.ToList()
+                .Where(a =>
+                    a.TeacherId != teacher.Id &&
+                    a.Course != null &&
+                    a.Year == NextSession.Year &&
+                    NextSession.ValidSessions.Contains(a.Course.Session)
+                )
+                .Select(a => a.CourseId)
+                .ToList();
+
+            List<Course> selectedCourses = DB.Courses.ToList()
+                .Where(c => selectedCourseIds.Contains(c.Id))
+                .ToList();
+
+            List<Course> availableCourses = DB.Courses.ToList()
+                .Where(c =>
+                    NextSession.ValidSessions.Contains(c.Session) &&
+                    !selectedCourseIds.Contains(c.Id) &&
+                    !coursesAlreadyGivenToOtherTeachers.Contains(c.Id)
+                )
                 .OrderBy(c => c.Session)
                 .ThenBy(c => c.Code)
                 .ToList();
 
             ViewBag.SelectedCourses = SelectListUtilities<Course>.Convert(selectedCourses, "Caption");
-            ViewBag.Courses = SelectListUtilities<Course>.Convert(allNextSessionCourses, "Caption");
+            ViewBag.Courses = SelectListUtilities<Course>.Convert(availableCourses, "Caption");
 
             return View(teacher);
         }
