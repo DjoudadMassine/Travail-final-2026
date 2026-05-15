@@ -1,38 +1,66 @@
 ﻿@model Models.Student
 
 @{
-    ViewBag.Title = "Modifier étudiant";
+    ViewBag.Title = "Étudiant - Modification";
 }
-
-<h2>Modifier étudiant</h2>
 
 @using (Html.BeginForm())
 {
     @Html.HiddenFor(m => m.Id)
     @Html.HiddenFor(m => m.Code)
 
-    <div class="form-group">
-        <label>Prénom</label>
-        @Html.TextBoxFor(m => m.FirstName, new { @class = "form-control" })
+    <div class="editPageWhite">
+
+        <div class="editPanelHeader">
+            <span class="editIcon"></span>
+            <h2>Étudiant - Modification</h2>
+        </div>
+
+        <div class="editSectionTitle">
+            ▼ Informations - [@Model.Code]
+        </div>
+
+        <div class="editField">
+            <label>Prénom</label>
+            @Html.TextBoxFor(m => m.FirstName, new { @class = "editInput" })
+        </div>
+
+        <div class="editField">
+            <label>Nom</label>
+            @Html.TextBoxFor(m => m.LastName, new { @class = "editInput" })
+        </div>
+
+        <div class="editField">
+            <label>Courriel</label>
+            @Html.TextBoxFor(m => m.Email, new { @class = "editInput" })
+        </div>
+
+        <div class="editSectionTitle">
+            ▼ Inscriptions : Session Automne 2026
+        </div>
+
+        <div class="dualListZone">
+            <select multiple class="editList">
+                <option>[1] 420-KB1-LG Introduction...</option>
+                <option>[3] 420-KB9-LG Développem...</option>
+                <option>[5] 420-KBG-LG Développem...</option>
+            </select>
+
+            <select multiple class="editList">
+                <option>[1] 201-KB1-LG Mathématiq...</option>
+                <option>[1] 420-KB2-LG Conception...</option>
+                <option>[3] 420-KB8-LG Programmat...</option>
+                <option>[5] 420-KBF-LG Profession...</option>
+            </select>
+        </div>
+
+        <div class="infoBubble">
+            Liste des cours offerts à l’automne
+        </div>
+
     </div>
 
-    <div class="form-group">
-        <label>Nom</label>
-        @Html.TextBoxFor(m => m.LastName, new { @class = "form-control" })
+    <div class="sessionFooter">
+        Session courante : Automne 2026
     </div>
-
-    <div class="form-group">
-        <label>Courriel</label>
-        @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
-    </div>
-
-    <br />
-
-    <button type="submit" class="btn btn-success">
-        Sauvegarder
-    </button>
 }
-
-<br />
-
-@Html.ActionLink("Retour", "Index")

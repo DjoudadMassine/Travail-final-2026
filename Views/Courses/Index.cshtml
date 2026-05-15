@@ -1,10 +1,33 @@
 ﻿@model IEnumerable<Models.Course>
 
+@{
+    ViewBag.Title = "Cours";
+    bool searchVisible = Session["CoursesSearchVisible"] as bool? ?? false;
+}
+
 <h2>Liste des cours</h2>
 
 <p>
     @Html.ActionLink("Ajouter un cours", "Create")
 </p>
+
+@if (searchVisible)
+{
+    <form method="get"
+          action="@Url.Action("Index", "Courses")"
+          class="searchBar">
+
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               class="searchInput"
+               placeholder="Rechercher un cours..." />
+
+        <button type="submit" class="searchButton">
+            Rechercher
+        </button>
+    </form>
+}
 
 <table class="table">
 
@@ -13,19 +36,22 @@
         <th>Titre</th>
         <th>Session</th>
         <th></th>
-
     </tr>
 
     @foreach (var course in Model)
     {
         <tr>
             <td>@course.Code</td>
+
             <td>@course.Title</td>
+
             <td>@course.Session</td>
 
             <td>
                 @Html.ActionLink("Détails", "Details", new { id = course.Id }) |
+
                 @Html.ActionLink("Modifier", "Edit", new { id = course.Id }) |
+
                 @Html.ActionLink("Supprimer", "Delete", new { id = course.Id })
             </td>
         </tr>

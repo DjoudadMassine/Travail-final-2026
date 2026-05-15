@@ -10,16 +10,51 @@ namespace LionelGroulx.Controllers
     public class StudentsController : Controller
     {
         // GET: Students
-        public ActionResult Index()
+        public ActionResult Index(string search)
         {
-            var students = DB.Students.ToList()
-                .OrderByDescending(s => s.Year)
-                .ThenBy(s => s.LastName)
-                .ToList();
+            var students = DB.Students.ToList();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.ToLower();
+
+                students = students
+                    .Where(s =>
+                        (s.Code != null && s.Code.ToLower().Contains(search)) ||
+                        (s.FirstName != null && s.FirstName.ToLower().Contains(search)) ||
+                        (s.LastName != null && s.LastName.ToLower().Contains(search)) ||
+                        (s.Email != null && s.Email.ToLower().Contains(search))
+                    )
+                    .ToList();
+            }
+
+            string sortBy = Session["StudentsSortBy"] as string ?? "Date";
+            bool descending = Session["StudentsSortDescending"] as bool? ?? true;
+
+            if (sortBy == "Title")
+            {
+                students = descending
+                    ? students.OrderByDescending(s => s.LastName).ThenByDescending(s => s.FirstName).ToList()
+                    : students.OrderBy(s => s.LastName).ThenBy(s => s.FirstName).ToList();
+            }
+            else
+            {
+                students = descending
+                    ? students.OrderByDescending(s => s.Year).ThenByDescending(s => s.Code).ToList()
+                    : students.OrderBy(s => s.Year).ThenBy(s => s.Code).ToList();
+            }
+
+            ViewBag.Search = search;
 
             return View(students);
         }
+        public ActionResult ToggleSearch()
+        {
+            Session["StudentsSearchVisible"] =
+                !(Session["StudentsSearchVisible"] as bool? ?? false);
 
+            return RedirectToAction("Index");
+        }
         // GET: Students/Details/5
         public ActionResult Details(int id)
         {
@@ -86,7 +121,20 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
+        public ActionResult ToggleSort()
+        {
+            bool descending = Session["StudentsSortDescending"] as bool? ?? false;
+            Session["StudentsSortDescending"] = !descending;
 
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult SetSortBy(string sortBy)
+        {
+            Session["StudentsSortBy"] = sortBy;
+
+            return RedirectToAction("Index");
+        }
         private string GenerateStudentCode()
         {
             Random random = new Random();

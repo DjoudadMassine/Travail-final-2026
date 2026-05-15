@@ -8,14 +8,66 @@ namespace LionelGroulx.Controllers
 {
     public class TeachersController : Controller
     {
-        public ActionResult Index()
+        public ActionResult Index(string search)
         {
-            var teachers = DB.Teachers.ToList()
-                .OrderBy(t => t.LastName)
-                .ThenBy(t => t.FirstName)
-                .ToList();
+            var teachers = DB.Teachers.ToList();
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                search = search.ToLower();
+
+                teachers = teachers
+                    .Where(t =>
+                        (t.Code != null && t.Code.ToLower().Contains(search)) ||
+                        (t.FirstName != null && t.FirstName.ToLower().Contains(search)) ||
+                        (t.LastName != null && t.LastName.ToLower().Contains(search)) ||
+                        (t.Email != null && t.Email.ToLower().Contains(search))
+                    )
+                    .ToList();
+            }
+
+            string sortBy = Session["TeachersSortBy"] as string ?? "Title";
+            bool descending = Session["TeachersSortDescending"] as bool? ?? false;
+
+            if (sortBy == "Date")
+            {
+                teachers = descending
+                    ? teachers.OrderByDescending(t => t.Code).ToList()
+                    : teachers.OrderBy(t => t.Code).ToList();
+            }
+            else
+            {
+                teachers = descending
+                    ? teachers.OrderByDescending(t => t.LastName).ThenByDescending(t => t.FirstName).ToList()
+                    : teachers.OrderBy(t => t.LastName).ThenBy(t => t.FirstName).ToList();
+            }
+
+            ViewBag.Search = search;
 
             return View(teachers);
+        }
+
+        public ActionResult ToggleSearch()
+        {
+            Session["TeachersSearchVisible"] =
+                !(Session["TeachersSearchVisible"] as bool? ?? false);
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult ToggleSort()
+        {
+            bool descending = Session["TeachersSortDescending"] as bool? ?? false;
+            Session["TeachersSortDescending"] = !descending;
+
+            return RedirectToAction("Index");
+        }
+
+        public ActionResult SetSortBy(string sortBy)
+        {
+            Session["TeachersSortBy"] = sortBy;
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult Details(int id)

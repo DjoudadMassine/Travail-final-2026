@@ -124,3 +124,36 @@ summary {
 .highlight {
     background-color: yellow;
 }
+
+.searchBar {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin: 15px 0;
+    padding: 10px;
+    background: #f5f5f5;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.searchInput {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid #aaa;
+    border-radius: 5px;
+    font-size: 15px;
+}
+
+.searchButton {
+    padding: 8px 14px;
+    background: #2d5fd3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .searchButton:hover {
+        background: #1f46a3;
+    }

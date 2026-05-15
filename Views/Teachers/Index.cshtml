@@ -1,18 +1,47 @@
 ﻿@model IEnumerable<Models.Teacher>
 
+@{
+    ViewBag.Title = "Enseignants";
+    bool searchVisible = Session["TeachersSearchVisible"] as bool? ?? false;
+}
+
 <h2>Liste des enseignants</h2>
 
 <p>
     @Html.ActionLink("Ajouter un enseignant", "Create")
 </p>
 
+@if (searchVisible)
+{
+    <form method="get"
+          action="@Url.Action("Index", "Teachers")"
+          class="searchBar">
+
+        <input type="text"
+               name="search"
+               value="@ViewBag.Search"
+               class="searchInput"
+               placeholder="Rechercher un enseignant..." />
+
+        <button type="submit" class="searchButton">
+            Rechercher
+        </button>
+    </form>
+}
+
 @foreach (var teacher in Model)
 {
-    <a href="@Url.Action("Details", "Teachers", new { id = teacher.Id })" class="TeacherLink">
+    <a href="@Url.Action("Details", "Teachers", new { id = teacher.Id })"
+       class="TeacherLink">
 
         <div class="TeacherListLayout">
+
             <img src="@teacher.Avatar"
-                 style="width:40px;height:40px;border-radius:50%;object-fit:cover;" />
+                 style="width:40px;
+                        height:40px;
+                        border-radius:50%;
+                        object-fit:cover;" />
+
             <span class="teacherCode">
                 @teacher.Code
             </span>
