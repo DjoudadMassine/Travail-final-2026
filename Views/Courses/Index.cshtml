@@ -45,29 +45,35 @@
 @section Scripts {
     <script>
 
-        function highlightCourses() {
+        function refreshCourseHighlight() {
 
-            let search = $("#searchInput").val();
+            let search = $("#searchInput").val().toLowerCase();
 
-            $(".courseSearchText").each(function () {
+            $(".CoursesListLayout").each(function () {
 
-                let original = $(this).data("original");
+                let row = $(this);
 
-                if (!search) {
-                    $(this).html(original);
-                    return;
+                let searchableText = row.text().toLowerCase();
+
+                if (search.trim() === "" || searchableText.includes(search)) {
+                    row.show();
+                }
+                else {
+                    row.hide();
                 }
 
-                let safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                row.find(".courseSearchText").each(function () {
 
-                let regex = new RegExp("(" + safeSearch + ")", "gi");
+                    if ($(this).data("original") == null) {
+                        $(this).data("original", $(this).html());
+                    }
 
-                $(this).html(
-                    original.replace(
-                        regex,
-                        "<span class='highlight'>$1</span>"
-                    )
-                );
+                    $(this).html($(this).data("original"));
+
+                    if (search.trim() !== "") {
+                        highlight(search, this);
+                    }
+                });
             });
         }
 
@@ -75,11 +81,10 @@
 
             RestoreDetailsState();
 
-            $(".courseSearchText").each(function () {
-                $(this).data("original", $(this).html());
+            $("#searchInput").on("input", function () {
+                refreshCourseHighlight();
             });
 
-            $("#searchInput").on("input", highlightCourses);
         });
 
     </script>

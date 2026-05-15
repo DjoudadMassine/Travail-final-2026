@@ -38,25 +38,38 @@
 
     </details>
 }
-
 @section Scripts {
     <script>
 
         function refreshStudentHighlight() {
 
-            let search = $("#searchInput").val();
+            let search = $("#searchInput").val().toLowerCase();
 
-            $(".searchable").each(function () {
+            $(".StudentListLayout").each(function () {
 
-                if ($(this).data("original") == null) {
-                    $(this).data("original", $(this).html());
+                let row = $(this);
+
+                let searchableText = row.text().toLowerCase();
+
+                if (search.trim() === "" || searchableText.includes(search)) {
+                    row.show();
+                }
+                else {
+                    row.hide();
                 }
 
-                $(this).html($(this).data("original"));
+                row.find(".searchable").each(function () {
 
-                if (search && search.trim() !== "") {
-                    highlight(search.toLowerCase(), this);
-                }
+                    if ($(this).data("original") == null) {
+                        $(this).data("original", $(this).html());
+                    }
+
+                    $(this).html($(this).data("original"));
+
+                    if (search.trim() !== "") {
+                        highlight(search, this);
+                    }
+                });
             });
         }
 
