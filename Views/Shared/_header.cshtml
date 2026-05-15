@@ -18,6 +18,11 @@
 
     string iconSortBy = "fa-solid fa-arrow-down-a-z";
     string iconSortByTitle = "Tri alphabétique";
+    bool userCanWrite =
+    userConnected &&
+    Models.User.ConnectedUser.Access >= Models.Access.Write;
+
+   
 }
 
 <div class="section roundedBorder">
@@ -83,7 +88,7 @@
             case "list":
                 <div id="mainMenuPanel" class="menu">
 
-                    @if (userIsAdmin)
+                    @if(userCanWrite)
                     {
                         <a href="/@controller/Create"
                            class="cmdIcon fa fa-circle-plus"
@@ -136,6 +141,17 @@
                                 <i class="menuIcon fa fa-chalkboard-user"></i>
                                 <a href="/Teachers">Profs</a>
                             </div>
+                            @if (userIsAdmin)
+                            {
+                                <div class="dropdown-divider"></div>
+
+                                <div class="dropdown-item item-layout">
+                                    <i class="menuIcon fa fa-users"></i>
+                                    <a href="/Accounts/ManageUsers">
+                                        Gestion des usagers
+                                    </a>
+                                </div>
+                            }
 
                             <div class="dropdown-divider"></div>
 
@@ -166,7 +182,7 @@
             case "details":
                 <div id="mainMenuPanel" class="menu">
 
-                    @if (userIsAdmin)
+                    @if (userCanWrite)
                     {
                         <a href="/@controller/Edit/@id"
                            class="cmdIcon fa fa-pen-to-square"
@@ -234,7 +250,7 @@
             case "loginsjournal":
             case "about":
                 <div id="mainMenuPanel" class="menu">
-                    <a href="@index"
+                    <a href="/Students"
                        class="cmdIcon fa fa-square-xmark"
                        title="Retour">
                     </a>

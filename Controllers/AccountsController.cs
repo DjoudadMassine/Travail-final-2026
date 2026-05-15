@@ -3,6 +3,7 @@ using EmailHandling;
 using Models;
 using System.Linq;
 using System.Web.Mvc;
+using static Controllers.AccessControl;
 
 namespace LionelGroulx.Controllers
 {
@@ -173,6 +174,7 @@ namespace LionelGroulx.Controllers
             return Redirect("/Accounts/Login?message=Erreur de vérification de courriel!&success=false");
         }
 
+
         public ActionResult EditProfil()
         {
             if (Models.User.ConnectedUser == null)
@@ -221,24 +223,27 @@ namespace LionelGroulx.Controllers
                 "/Accounts/Login?message=Compte supprimé&success=true"
             );
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult ManageUsers()
         {
-            if (!IsAdmin())
-                return RedirectToAction("Login");
-
-            return View(
-                DB.Users.ToList()
-                    .OrderBy(u => u.Name)
-                    .ToList()
-            );
+            ViewBag.PageTitle = "Gestion des usagers";
+            return View();
         }
 
+        [UserAccess(Access.Admin)]
+        public ActionResult GetUsers(bool forceRefresh = false)
+        {
+            var users = DB.Users.ToList()
+                .Where(u => Models.User.ConnectedUser == null || u.Id != Models.User.ConnectedUser.Id)
+                .OrderBy(u => u.Name)
+                .ToList();
+
+            return PartialView(users);
+        }
+
+        [UserAccess(Access.Admin)]
         public ActionResult SetUserAccess(int userid, int access)
         {
-            if (!IsAdmin())
-                return RedirectToAction("Login");
-
             Models.User user = DB.Users.Get(userid);
 
             if (user != null && user.Id != 1)
@@ -247,37 +252,47 @@ namespace LionelGroulx.Controllers
                 DB.Users.Update(user);
             }
 
-            return RedirectToAction("ManageUsers");
+            return null;
+        }
+        [UserAccess(Access.Admin)]
+        public ActionResult ForceVerifyUser(int id)
+        {
+            Models.User user = DB.Users.Get(id);
+
+            if (user != null && user.Id != 1)
+            {
+                user.Verified = true;
+                DB.Users.Update(user);
+            }
+
+            return null;
         }
 
+
+        [UserAccess(Access.Admin)]
         public ActionResult ToggleBlockUser(int id)
         {
-            if (!IsAdmin())
-                return RedirectToAction("Login");
-
             Models.User user = DB.Users.Get(id);
 
             if (user != null && user.Id != 1)
             {
                 user.Blocked = !user.Blocked;
                 user.Online = false;
-
                 DB.Users.Update(user);
             }
 
-            return RedirectToAction("ManageUsers");
+            return null;
         }
 
 
+
+        [UserAccess(Access.Admin)]
         public ActionResult DeleteUser(int id)
         {
-            if (!IsAdmin())
-                return RedirectToAction("Login");
-
             if (id != 1)
                 DB.Users.Delete(id);
 
-            return RedirectToAction("ManageUsers");
+            return null;
         }
 
         private bool IsAdmin()

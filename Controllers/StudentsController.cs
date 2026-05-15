@@ -70,7 +70,7 @@ namespace LionelGroulx.Controllers
 
             return View(student);
         }
-        [UserAccess(Access.Admin)]
+        [UserAccess(Access.Write)]
         public ActionResult Create()
         {
             ViewBag.PageTitle = "Étudiant - Ajout";
@@ -90,7 +90,7 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
-        [UserAccess(Access.Admin)]
+        [UserAccess(Access.Write)]
         public ActionResult Edit(int id)
         {
             Student student = DB.Students.Get(id);
@@ -129,7 +129,7 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Details", new { id = student.Id });
         }
-        [UserAccess(Access.Admin)]
+        [UserAccess(Access.Write)]
         public ActionResult Delete(int id)
         {
             Student student = DB.Students.Get(id);
