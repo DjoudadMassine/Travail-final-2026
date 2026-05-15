@@ -1,0 +1,36 @@
+﻿@model IEnumerable<Models.Student>
+
+@{
+    var years = Model
+        .Select(s => s.Year)
+        .Distinct()
+        .OrderByDescending(y => y)
+        .ToList();
+}
+
+@foreach (var year in years)
+{
+    <details open id="student_details_@year">
+
+        <summary>
+            Cohorte @year
+        </summary>
+
+        @foreach (var student in Model.Where(s => s.Year == year))
+        {
+            <div class="StudentListLayout"
+                 onclick="window.location='@Url.Action("Details", "Students", new { id = student.Id })'">
+
+                <div class="studentCode searchable">
+                    @student.Code
+                </div>
+
+                <div class="searchable">
+                    @student.FullName
+                </div>
+
+            </div>
+        }
+
+    </details>
+}

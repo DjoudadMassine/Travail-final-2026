@@ -2,64 +2,23 @@
 
 @{
     ViewBag.PageTitle = "Cours - Détails";
-
-    var registrations = DAL.DB.Registrations.ToList()
-        .Where(r => r.CourseId == Model.Id && r.Student != null)
-        .OrderByDescending(r => r.Year)
-        .ThenBy(r => r.Student.LastName)
-        .ThenBy(r => r.Student.FirstName)
-        .ToList();
-
-    var years = registrations
-        .Select(r => r.Year)
-        .Distinct()
-        .OrderByDescending(y => y)
-        .ToList();
 }
 
-<h3>@Model.Code</h3>
-<h4>Session @Model.Session</h4>
-<p><strong>@Model.Title</strong></p>
+<div id="courseDetailsPanel">
+    @Html.Partial("GetCourseDetails", Model)
+</div>
 
-<hr />
-
-<h3>Étudiants inscrits</h3>
-
-@foreach (var year in years)
-{
-    var allocation = DAL.DB.Allocations.ToList()
-        .FirstOrDefault(a =>
-            a.CourseId == Model.Id &&
-            a.Year == year &&
-            a.Teacher != null);
-
-    <details open id="course_details_@year">
-        <summary>
-            Cohorte @year
-            @if (allocation != null)
-            {
-                <span> - </span>
-                @Html.ActionLink(
-                    allocation.Teacher.LastName + " " + allocation.Teacher.FirstName,
-                    "Details",
-                    "Teachers",
-                    new { id = allocation.Teacher.Id },
-                    null
-                )
-            }
-        </summary>
-
-        @foreach (var registration in registrations.Where(r => r.Year == year))
-        {
-            <div>
-                @Html.ActionLink(
-                    registration.Student.Code + " " + registration.Student.LastName + " " + registration.Student.FirstName,
-                    "Details",
-                    "Students",
-                    new { id = registration.Student.Id },
-                    null
-                )
-            </div>
-        }
-    </details>
+@section Scripts {
+    <script>
+        $(() => {
+            new AutoRefreshedPanel(
+                "courseDetailsPanel",
+                "/Courses/GetCourseDetails/@Model.Id",
+                5,
+                function () {
+                    RestoreDetailsState();
+                }
+            );
+        });
+    </script>
 }

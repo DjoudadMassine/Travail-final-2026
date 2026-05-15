@@ -4,84 +4,50 @@
     ViewBag.PageTitle = "Étudiants";
 }
 
-@{
-    var years = Model
-        .Select(s => s.Year)
-        .Distinct()
-        .OrderByDescending(y => y)
-        .ToList();
-}
+<div id="studentsPanel">
+    @Html.Partial("GetStudents", Model)
+</div>
 
-@foreach (var year in years)
-{
-    <details open id="student_details_@year">
-
-        <summary>
-            Cohorte @year
-        </summary>
-
-        @foreach (var student in Model.Where(s => s.Year == year))
-        {
-            <div class="StudentListLayout"
-                 onclick="window.location='@Url.Action("Details", "Students", new { id = student.Id })'">
-
-                <div class="studentCode searchable">
-                    @student.Code
-                </div>
-
-                <div class="searchable">
-                    @student.FullName
-                </div>
-
-            </div>
-        }
-
-    </details>
-}
 @section Scripts {
     <script>
-
         function refreshStudentHighlight() {
-
             let search = $("#searchInput").val().toLowerCase();
 
             $(".StudentListLayout").each(function () {
-
                 let row = $(this);
-
                 let searchableText = row.text().toLowerCase();
 
-                if (search.trim() === "" || searchableText.includes(search)) {
+                if (search.trim() === "" || searchableText.includes(search))
                     row.show();
-                }
-                else {
+                else
                     row.hide();
-                }
 
                 row.find(".searchable").each(function () {
-
-                    if ($(this).data("original") == null) {
+                    if ($(this).data("original") == null)
                         $(this).data("original", $(this).html());
-                    }
 
                     $(this).html($(this).data("original"));
 
-                    if (search.trim() !== "") {
+                    if (search.trim() !== "")
                         highlight(search, this);
-                    }
                 });
             });
         }
 
         $(() => {
+            new AutoRefreshedPanel("studentsPanel", "/Students/GetStudents", 5, function () {
+                RestoreDetailsState();
 
-            RestoreDetailsState();
+                $(".searchable").each(function () {
+                    $(this).data("original", $(this).html());
+                });
+
+                refreshStudentHighlight();
+            });
 
             $("#searchInput").on("input", function () {
                 refreshStudentHighlight();
             });
-
         });
-
     </script>
 }

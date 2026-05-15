@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Models.Course>
+
+@{
+    var sessions = Model
+        .Select(c => c.Session)
+        .Distinct()
+        .OrderBy(s => s)
+        .ToList();
+}
+
+@foreach (var session in sessions)
+{
+    <details open id="course_details_@session">
+
+        <summary>
+            Session @session
+        </summary>
+
+        @foreach (var course in Model
+            .Where(c => c.Session == session)
+            .OrderBy(c => c.Code))
+        {
+            <div class="CoursesListLayout">
+
+                <a href="@Url.Action("Details", "Courses", new { id = course.Id })">
+
+                    <span class="courseCode courseSearchText searchable">
+                        @course.Code
+                    </span>
+
+                    <span class="courseSearchText searchable">
+                        @course.Title
+                    </span>
+
+                </a>
+
+            </div>
+        }
+
+    </details>
+}

@@ -4,31 +4,9 @@
     ViewBag.PageTitle = "Profs";
 }
 
-@foreach (var teacher in Model)
-{
-    <a href="@Url.Action("Details", "Teachers", new { id = teacher.Id })"
-       class="TeacherLink">
-
-        <div class="TeacherListLayout">
-
-            <img src="@teacher.Avatar"
-                 style="width:40px;
-                        height:40px;
-                        border-radius:50%;
-                        object-fit:cover;" />
-
-            <span class="teacherCode teacherSearchText">
-                @teacher.Code
-            </span>
-
-            <span class="teacherSearchText">
-                @teacher.LastName @teacher.FirstName
-            </span>
-
-        </div>
-
-    </a>
-}
+<div id="teachersPanel">
+    @Html.Partial("GetTeachers", Model)
+</div>
 
 @section Scripts {
     <script>
@@ -43,34 +21,42 @@
 
                 let searchableText = row.text().toLowerCase();
 
-                if (search.trim() === "" || searchableText.includes(search)) {
+                if (search.trim() === "" || searchableText.includes(search))
                     row.show();
-                }
-                else {
+                else
                     row.hide();
-                }
 
                 row.find(".searchable").each(function () {
 
-                    if ($(this).data("original") == null) {
+                    if ($(this).data("original") == null)
                         $(this).data("original", $(this).html());
-                    }
 
                     $(this).html($(this).data("original"));
 
-                    if (search.trim() !== "") {
+                    if (search.trim() !== "")
                         highlight(search, this);
-                    }
                 });
             });
         }
 
         $(() => {
 
+            new AutoRefreshedPanel(
+                "teachersPanel",
+                "/Teachers/GetTeachers",
+                5,
+                function () {
+
+                    $(".searchable").each(function () {
+                        $(this).data("original", $(this).html());
+                    });
+
+                    refreshTeacherHighlight();
+                });
+
             $("#searchInput").on("input", function () {
                 refreshTeacherHighlight();
             });
-
         });
 
     </script>

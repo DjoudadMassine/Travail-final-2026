@@ -198,7 +198,24 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
+        public ActionResult GetTeachers(bool forceRefresh = false)
+        {
+            var teachers = DB.Teachers.ToList()
+                .OrderBy(t => t.LastName)
+                .ThenBy(t => t.FirstName)
+                .ToList();
 
+            return PartialView(teachers);
+        }
+        public ActionResult GetTeacherDetails(int id, bool forceRefresh = false)
+        {
+            Teacher teacher = DB.Teachers.Get(id);
+
+            if (teacher == null)
+                return null;
+
+            return PartialView(teacher);
+        }
         private string GenerateTeacherCode()
         {
             Random random = new Random();

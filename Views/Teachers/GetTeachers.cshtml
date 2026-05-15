@@ -1,0 +1,27 @@
+﻿@model IEnumerable<Models.Teacher>
+
+@foreach (var teacher in Model)
+{
+    <a href="@Url.Action("Details", "Teachers", new { id = teacher.Id })"
+       class="TeacherLink">
+
+        <div class="TeacherListLayout">
+
+            <img src="@teacher.Avatar"
+                 style="width:40px;
+                        height:40px;
+                        border-radius:50%;
+                        object-fit:cover;" />
+
+            <span class="teacherCode searchable">
+                @teacher.Code
+            </span>
+
+            <span class="searchable">
+                @teacher.LastName @teacher.FirstName
+            </span>
+
+        </div>
+
+    </a>
+}

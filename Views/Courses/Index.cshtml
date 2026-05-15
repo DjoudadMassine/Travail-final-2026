@@ -2,45 +2,11 @@
 
 @{
     ViewBag.PageTitle = "Cours";
-
-    var sessions = Model
-        .Select(c => c.Session)
-        .Distinct()
-        .OrderBy(s => s)
-        .ToList();
 }
 
-@foreach (var session in sessions)
-{
-    <details open id="course_details_@session">
-
-        <summary>
-            Session @session
-        </summary>
-
-        @foreach (var course in Model
-            .Where(c => c.Session == session)
-            .OrderBy(c => c.Code))
-        {
-            <div class="CoursesListLayout">
-
-                <a href="@Url.Action("Details", "Courses", new { id = course.Id })">
-
-                    <span class="courseCode courseSearchText">
-                        @course.Code
-                    </span>
-
-                    <span class="courseSearchText">
-                        @course.Title
-                    </span>
-
-                </a>
-
-            </div>
-        }
-
-    </details>
-}
+<div id="coursesPanel">
+    @Html.Partial("GetCourses", Model)
+</div>
 
 @section Scripts {
     <script>
@@ -55,31 +21,40 @@
 
                 let searchableText = row.text().toLowerCase();
 
-                if (search.trim() === "" || searchableText.includes(search)) {
+                if (search.trim() === "" || searchableText.includes(search))
                     row.show();
-                }
-                else {
+                else
                     row.hide();
-                }
 
-                row.find(".courseSearchText").each(function () {
+                row.find(".searchable").each(function () {
 
-                    if ($(this).data("original") == null) {
+                    if ($(this).data("original") == null)
                         $(this).data("original", $(this).html());
-                    }
 
                     $(this).html($(this).data("original"));
 
-                    if (search.trim() !== "") {
+                    if (search.trim() !== "")
                         highlight(search, this);
-                    }
                 });
             });
         }
 
         $(() => {
 
-            RestoreDetailsState();
+            new AutoRefreshedPanel(
+                "coursesPanel",
+                "/Courses/GetCourses",
+                5,
+                function () {
+
+                    RestoreDetailsState();
+
+                    $(".searchable").each(function () {
+                        $(this).data("original", $(this).html());
+                    });
+
+                    refreshCourseHighlight();
+                });
 
             $("#searchInput").on("input", function () {
                 refreshCourseHighlight();

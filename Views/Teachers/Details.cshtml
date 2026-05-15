@@ -2,59 +2,24 @@
 
 @{
     ViewBag.PageTitle = "Prof - Détails";
-
-    var allocations = DAL.DB.Allocations.ToList()
-        .Where(a => a.TeacherId == Model.Id && a.Course != null)
-        .OrderByDescending(a => a.Year)
-        .ThenBy(a => a.Course.Session)
-        .ThenBy(a => a.Course.Code)
-        .ToList();
-
-    var years = allocations
-        .Select(a => a.Year)
-        .Distinct()
-        .OrderByDescending(y => y)
-        .ToList();
 }
 
-<details open>
-    <summary>
-        <i class="fa fa-user"></i>
-        @Model.FirstName @Model.LastName
-    </summary>
+<div id="teacherDetailsPanel">
+    @Html.Partial("GetTeacherDetails", Model)
+</div>
 
-    <p><i class="fa fa-barcode"></i> @Model.Code</p>
-    <p><i class="fa fa-phone"></i> @Model.Phone</p>
+@section Scripts {
+    <script>
+        $(() => {
 
-    <p>
-        Embauché le @Model.StartDate.ToString("dd MMMM yyyy")<br />
-        @(DateTime.Now.Year - Model.StartDate.Year) ans d'ancienneté
-    </p>
+            new AutoRefreshedPanel(
+                "teacherDetailsPanel",
+                "/Teachers/GetTeacherDetails/@Model.Id",
+                5,
+                function () {
+                    RestoreDetailsState();
+                });
 
-    @Helper.Image(Model.Avatar, "UserSmallAvatar")
-</details>
-
-<hr />
-
-<h3>Allocations</h3>
-
-@foreach (var year in years)
-{
-    <details open id="teacher_details_@year">
-        <summary>@year</summary>
-
-        @foreach (var allocation in allocations.Where(a => a.Year == year))
-        {
-            <div>
-                [@allocation.Course.Session]
-                @Html.ActionLink(
-                    allocation.Course.Code + " " + allocation.Course.Title,
-                    "Details",
-                    "Courses",
-                    new { id = allocation.Course.Id },
-                    null
-                )
-            </div>
-        }
-    </details>
+        });
+    </script>
 }

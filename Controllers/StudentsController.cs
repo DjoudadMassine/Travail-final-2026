@@ -68,7 +68,7 @@ namespace LionelGroulx.Controllers
 
             return View(student);
         }
-     
+
         public ActionResult Create()
         {
             ViewBag.PageTitle = "Étudiant - Ajout";
@@ -140,7 +140,25 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
+        public ActionResult GetStudents(bool forceRefresh = false)
+        {
+            var students = DB.Students.ToList()
+                .OrderByDescending(s => s.Year)
+                .ThenBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .ToList();
 
+            return PartialView(students);
+        }
+        public ActionResult GetStudentDetails(int id, bool forceRefresh = false)
+        {
+            Student student = DB.Students.Get(id);
+
+            if (student == null)
+                return null;
+
+            return PartialView(student);
+        }
         private string GenerateStudentCode()
         {
             Random random = new Random();

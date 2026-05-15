@@ -1,0 +1,57 @@
+﻿@model Models.Teacher
+
+@{
+    var allocations = DAL.DB.Allocations.ToList()
+        .Where(a => a.TeacherId == Model.Id && a.Course != null)
+        .OrderByDescending(a => a.Year)
+        .ThenBy(a => a.Course.Session)
+        .ThenBy(a => a.Course.Code)
+        .ToList();
+
+    var years = allocations
+        .Select(a => a.Year)
+        .Distinct()
+        .OrderByDescending(y => y)
+        .ToList();
+}
+
+<div class="UserMediumAvatar"
+     style="background:url('@Model.Avatar');
+            background-size:cover;
+            background-position:center;">
+</div>
+
+<hr />
+
+<p><strong>Code :</strong> @Model.Code</p>
+<p><strong>Nom :</strong> @Model.LastName @Model.FirstName</p>
+<p><strong>Téléphone :</strong> @Model.Phone</p>
+<p><strong>Date d'embauche :</strong> @Model.StartDate.ToString("yyyy-MM-dd")</p>
+
+<hr />
+
+<h3>Allocations</h3>
+
+@foreach (var year in years)
+{
+    <details open id="teacher_details_@year">
+
+        <summary>
+            Cohorte @year
+        </summary>
+
+        @foreach (var allocation in allocations.Where(a => a.Year == year))
+        {
+            <div>
+                @Html.ActionLink(
+                    allocation.Course.Code + " " + allocation.Course.Title,
+                    "Details",
+                    "Courses",
+                    new { id = allocation.Course.Id },
+                    null
+                )
+            </div>
+        }
+
+    </details>
+}

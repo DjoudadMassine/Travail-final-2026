@@ -188,5 +188,25 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
+
+        public ActionResult GetCourses(bool forceRefresh = false)
+        {
+            var courses = DB.Courses.ToList()
+                .OrderBy(c => c.Session)
+                .ThenBy(c => c.Code)
+                .ToList();
+
+            return PartialView(courses);
+        }
+        public ActionResult GetCourseDetails(int id, bool forceRefresh = false)
+        {
+            Course course = DB.Courses.Get(id);
+
+            if (course == null)
+                return null;
+
+            return PartialView(course);
+        }
+
     }
 }
