@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Mvc;
 
 namespace Models
 {
@@ -11,7 +12,6 @@ namespace Models
 
         public string Title { get; set; }
 
-        // 1 à 6
         public int Session { get; set; }
 
         [JsonIgnore]
@@ -24,15 +24,22 @@ namespace Models
             .ToList();
 
         [JsonIgnore]
+        public List<Registration> NextSessionRegistrations =>
+            Registrations
+            .Where(r => r.IsNextSession)
+            .ToList();
+
+        [JsonIgnore]
         public List<Student> Students
         {
             get
             {
                 List<Student> students = new List<Student>();
 
-                foreach (var registration in Registrations)
+                foreach (Registration registration in Registrations)
                 {
-                    students.Add(registration.Student);
+                    if (registration.Student != null)
+                        students.Add(registration.Student);
                 }
 
                 return students;
@@ -40,9 +47,56 @@ namespace Models
         }
 
         [JsonIgnore]
+        public List<Student> NextSessionStudents
+        {
+            get
+            {
+                List<Student> students = new List<Student>();
+
+                foreach (Registration registration in NextSessionRegistrations)
+                {
+                    if (registration.Student != null)
+                        students.Add(registration.Student);
+                }
+
+                return students;
+            }
+        }
+
+        [JsonIgnore]
+        public SelectList NextSessionStudentsToSelectList =>
+            SelectListUtilities<Student>.Convert(NextSessionStudents, "Caption");
+
+        [JsonIgnore]
         public List<Allocation> Allocations =>
             DB.Allocations.ToList()
             .Where(a => a.CourseId == Id)
             .ToList();
+
+        public void DeleteNextSessionRegistrations()
+        {
+            foreach (Registration registration in NextSessionRegistrations.ToList())
+            {
+                DB.Registrations.Delete(registration.Id);
+            }
+        }
+
+        public void UpdateRegistrations(List<int> selectedStudentsId)
+        {
+            DeleteNextSessionRegistrations();
+
+            if (selectedStudentsId != null)
+            {
+                foreach (int studentId in selectedStudentsId)
+                {
+                    DB.Registrations.Add(new Registration
+                    {
+                        StudentId = studentId,
+                        CourseId = Id,
+                        Year = NextSession.Year
+                    });
+                }
+            }
+        }
     }
 }

@@ -1,25 +1,59 @@
 ﻿@model Models.Student
 
 @{
-    ViewBag.Title = "Détails étudiant";
+    ViewBag.PageTitle = "Étudiant - Détails";
+
+    var registrations = DAL.DB.Registrations.ToList()
+        .Where(r => r.StudentId == Model.Id && r.Course != null)
+        .OrderByDescending(r => r.Year)
+        .ThenBy(r => r.Course.Session)
+        .ThenBy(r => r.Course.Code)
+        .ToList();
+
+    var years = registrations
+        .Select(r => r.Year)
+        .Distinct()
+        .OrderByDescending(y => y)
+        .ToList();
 }
 
-<h2>Détails étudiant</h2>
+<details open>
+    <summary>
+        <i class="fa fa-graduation-cap"></i>
+        @Model.FirstName @Model.LastName
+    </summary>
+
+    <p><i class="fa fa-barcode"></i> @Model.Code</p>
+    <p><i class="fa fa-phone"></i> @Model.Phone</p>
+    <p><i class="fa fa-paper-plane"></i> @Model.Email</p>
+
+    @if (Model.BirthDate.Year > 1900)
+    {
+        <p><i class="fa fa-cake-candles"></i> @Model.BirthDate.ToString("dd MMMM yyyy")</p>
+    }
+</details>
 
 <hr />
 
-<dl class="dl-horizontal">
+<h3>Inscriptions</h3>
 
-    <dt>Code</dt>
-    <dd>@Model.Code</dd>
+@foreach (var year in years)
+{
+    <details open id="student_details_@year">
+        <summary>@year</summary>
 
-    <dt>Prénom</dt>
-    <dd>@Model.FirstName</dd>
-
-    <dt>Nom</dt>
-    <dd>@Model.LastName</dd>
-
-    <dt>Courriel</dt>
-    <dd>@Model.Email</dd>
-
-</dl>
+        @foreach (var registration in registrations.Where(r => r.Year == year))
+        {
+            <div>
+                [@registration.Course.Session]
+                @Html.ActionLink(
+                    registration.Course.Code + " " + registration.Course.Title,
+                    "Details",
+                    "Courses",
+                    new { id = registration.Course.Id },
+                    null
+                )
+            </div>
+        }
+    </details>
+}

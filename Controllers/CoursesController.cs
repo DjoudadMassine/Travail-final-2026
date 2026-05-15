@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 using DAL;
 using Models;
@@ -9,35 +10,26 @@ namespace LionelGroulx.Controllers
     {
         public ActionResult Index(string search)
         {
-            var courses = DB.Courses.ToList();
+            ViewBag.PageTitle = "Cours";
+
+            List<Course> courses = DB.Courses.ToList();
 
             if (!string.IsNullOrWhiteSpace(search))
             {
-                search = search.ToLower();
+                string s = search.ToLower();
 
                 courses = courses
                     .Where(c =>
-                        (c.Code != null && c.Code.ToLower().Contains(search)) ||
-                        (c.Title != null && c.Title.ToLower().Contains(search))
+                        (c.Code != null && c.Code.ToLower().Contains(s)) ||
+                        (c.Title != null && c.Title.ToLower().Contains(s))
                     )
                     .ToList();
             }
 
-            string sortBy = Session["CoursesSortBy"] as string ?? "Date";
-            bool descending = Session["CoursesSortDescending"] as bool? ?? false;
-
-            if (sortBy == "Title")
-            {
-                courses = descending
-                    ? courses.OrderByDescending(c => c.Title).ToList()
-                    : courses.OrderBy(c => c.Title).ToList();
-            }
-            else
-            {
-                courses = descending
-                    ? courses.OrderByDescending(c => c.Session).ThenByDescending(c => c.Code).ToList()
-                    : courses.OrderBy(c => c.Session).ThenBy(c => c.Code).ToList();
-            }
+            courses = courses
+                .OrderBy(c => c.Session)
+                .ThenBy(c => c.Code)
+                .ToList();
 
             ViewBag.Search = search;
 
@@ -46,26 +38,22 @@ namespace LionelGroulx.Controllers
 
         public ActionResult ToggleSearch()
         {
-            Session["CoursesSearchVisible"] =
-                !(Session["CoursesSearchVisible"] as bool? ?? false);
-
+            Session["Search"] = !(Session["Search"] as bool? ?? false);
             return RedirectToAction("Index");
         }
 
         public ActionResult ToggleSort()
         {
-            bool descending = Session["CoursesSortDescending"] as bool? ?? false;
-            Session["CoursesSortDescending"] = !descending;
-
+            Session["SortAscending"] = !(Session["SortAscending"] as bool? ?? false);
             return RedirectToAction("Index");
         }
 
         public ActionResult SetSortBy(string sortBy)
         {
             Session["CoursesSortBy"] = sortBy;
-
             return RedirectToAction("Index");
         }
+
         public ActionResult Details(int id)
         {
             Course course = DB.Courses.Get(id);
@@ -73,24 +61,27 @@ namespace LionelGroulx.Controllers
             if (course == null)
                 return RedirectToAction("Index");
 
+            ViewBag.PageTitle = "Cours - Détails";
+
             return View(course);
         }
 
         public ActionResult Create()
         {
+            ViewBag.PageTitle = "Cours - Ajout";
             return View();
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public ActionResult Create(Course course)
         {
-            if (ModelState.IsValid)
-            {
-                DB.Courses.Add(course);
+            if (course == null)
                 return RedirectToAction("Index");
-            }
 
-            return View(course);
+            DB.Courses.Add(course);
+
+            return RedirectToAction("Index");
         }
 
         public ActionResult Edit(int id)
@@ -100,24 +91,101 @@ namespace LionelGroulx.Controllers
             if (course == null)
                 return RedirectToAction("Index");
 
+            ViewBag.PageTitle = "Cours - Modification";
+
+            List<int> selectedStudentIds = DB.Registrations.ToList()
+                .Where(r =>
+                    r.CourseId == course.Id &&
+                    r.Student != null &&
+                    r.Year == NextSession.Year &&
+                    NextSession.ValidSessions.Contains(course.Session)
+                )
+                .Select(r => r.StudentId)
+                .ToList();
+
+            List<Student> allStudents = DB.Students.ToList()
+                .OrderBy(s => s.LastName)
+                .ThenBy(s => s.FirstName)
+                .ToList();
+
+            List<Student> selectedStudents = allStudents
+                .Where(s => selectedStudentIds.Contains(s.Id))
+                .ToList();
+
+            List<Student> availableStudents = allStudents
+                .Where(s => !selectedStudentIds.Contains(s.Id))
+                .ToList();
+
+            ViewBag.SelectedStudents = SelectListUtilities<Student>.Convert(selectedStudents, "Caption");
+            ViewBag.Students = SelectListUtilities<Student>.Convert(availableStudents, "Caption");
+
             return View(course);
         }
 
         [HttpPost]
-        public ActionResult Edit(Course course)
+        [ValidateAntiForgeryToken]
+        public ActionResult Edit(Course course, List<int> selectedStudentsId)
         {
-            if (ModelState.IsValid)
+            if (course == null)
+                return RedirectToAction("Index");
+
+            Course storedCourse = DB.Courses.Get(course.Id);
+
+            if (storedCourse == null)
+                return RedirectToAction("Index");
+
+            DB.Courses.Update(course);
+
+            List<Registration> oldRegistrations = DB.Registrations.ToList()
+                .Where(r =>
+                    r.CourseId == course.Id &&
+                    r.Year == NextSession.Year
+                )
+                .ToList();
+
+            foreach (Registration registration in oldRegistrations)
             {
-                DB.Courses.Update(course);
-                return RedirectToAction("Details", new { id = course.Id });
+                DB.Registrations.Delete(registration.Id);
             }
 
-            return View(course);
+            if (selectedStudentsId != null)
+            {
+                foreach (int studentId in selectedStudentsId)
+                {
+                    DB.Registrations.Add(new Registration
+                    {
+                        StudentId = studentId,
+                        CourseId = course.Id,
+                        Year = NextSession.Year
+                    });
+                }
+            }
+
+            return RedirectToAction("Details", new { id = course.Id });
         }
 
         public ActionResult Delete(int id)
         {
+            List<Registration> registrations = DB.Registrations.ToList()
+                .Where(r => r.CourseId == id)
+                .ToList();
+
+            foreach (Registration registration in registrations)
+            {
+                DB.Registrations.Delete(registration.Id);
+            }
+
+            List<Allocation> allocations = DB.Allocations.ToList()
+                .Where(a => a.CourseId == id)
+                .ToList();
+
+            foreach (Allocation allocation in allocations)
+            {
+                DB.Allocations.Delete(allocation.Id);
+            }
+
             DB.Courses.Delete(id);
+
             return RedirectToAction("Index");
         }
     }

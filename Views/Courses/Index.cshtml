@@ -1,60 +1,52 @@
 ﻿@model IEnumerable<Models.Course>
 
 @{
-    ViewBag.Title = "Cours";
-    bool searchVisible = Session["CoursesSearchVisible"] as bool? ?? false;
+    ViewBag.PageTitle = "Cours";
+    string search = ViewBag.Search != null ? ViewBag.Search.ToString() : "";
+    var sessions = Model.Select(c => c.Session).Distinct().OrderBy(s => s).ToList();
 }
 
-<h2>Liste des cours</h2>
-
-<p>
-    @Html.ActionLink("Ajouter un cours", "Create")
-</p>
-
-@if (searchVisible)
+@if (Session["Search"] != null && (bool)Session["Search"])
 {
-    <form method="get"
-          action="@Url.Action("Index", "Courses")"
-          class="searchBar">
-
+    <form method="get" action="@Url.Action("Index", "Courses")">
         <input type="text"
                name="search"
-               value="@ViewBag.Search"
-               class="searchInput"
-               placeholder="Rechercher un cours..." />
-
-        <button type="submit" class="searchButton">
-            Rechercher
-        </button>
+               value="@search"
+               class="form-control"
+               placeholder="Recherche..." />
     </form>
 }
 
-<table class="table">
+@foreach (var session in sessions)
+{
+    <details open id="course_details_@session">
+        <summary>Session @session</summary>
 
-    <tr>
-        <th>Code</th>
-        <th>Titre</th>
-        <th>Session</th>
-        <th></th>
-    </tr>
+        @foreach (var course in Model.Where(c => c.Session == session).OrderBy(c => c.Code))
+        {
+            <div class="CoursesListLayout">
+                <a href="@Url.Action("Details", "Courses", new { id = course.Id })">
+                    <span class="courseCode">@course.Code</span>
+                    <span>
+                        @if (!string.IsNullOrWhiteSpace(search))
+                        {
+                            @Html.Raw(course.Title.Replace(search, "<span class='highlight'>" + search + "</span>"))
+                        }
+                        else
+                        {
+                            @course.Title
+                        }
+                    </span>
+                </a>
+            </div>
+        }
+    </details>
+}
 
-    @foreach (var course in Model)
-    {
-        <tr>
-            <td>@course.Code</td>
-
-            <td>@course.Title</td>
-
-            <td>@course.Session</td>
-
-            <td>
-                @Html.ActionLink("Détails", "Details", new { id = course.Id }) |
-
-                @Html.ActionLink("Modifier", "Edit", new { id = course.Id }) |
-
-                @Html.ActionLink("Supprimer", "Delete", new { id = course.Id })
-            </td>
-        </tr>
-    }
-
-</table>
+@section Scripts {
+    <script>
+        $(() => {
+            RestoreDetailsState();
+        });
+    </script>
+}

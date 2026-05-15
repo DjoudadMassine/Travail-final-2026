@@ -1,7 +1,5 @@
 ﻿using DAL;
 using Newtonsoft.Json;
-using System;
-
 
 namespace Models
 {
@@ -9,7 +7,7 @@ namespace Models
     {
         public Registration()
         {
-            Year = DateTime.Now.Year;
+            Year = NextSession.Year;
         }
 
         public int StudentId { get; set; }
@@ -23,5 +21,11 @@ namespace Models
 
         [JsonIgnore]
         public Course Course => DB.Courses.Get(CourseId);
+
+        [JsonIgnore]
+        public bool IsNextSession =>
+            Course != null &&
+            Year == NextSession.Year &&
+            NextSession.ValidSessions.Contains(Course.Session);
     }
 }

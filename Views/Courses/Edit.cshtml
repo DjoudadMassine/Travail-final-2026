@@ -1,29 +1,64 @@
 ﻿@model Models.Course
 
-<h2>Modifier un cours</h2>
+@{
+    ViewBag.PageTitle = "Cours - Modification";
+}
 
 @using (Html.BeginForm())
 {
+    @Html.AntiForgeryToken()
+
     @Html.HiddenFor(m => m.Id)
 
-    <div class="form-group">
-        <label>Code</label>
-        @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
-    </div>
+    <details open>
+        <summary>Informations - [@Model.Code]</summary>
 
-    <div class="form-group">
-        <label>Titre</label>
-        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
-    </div>
-
-    <div class="form-group">
         <label>Session</label>
         @Html.TextBoxFor(m => m.Session, new { @class = "form-control", type = "number", min = "1", max = "6" })
-    </div>
 
-    <br />
-    <button type="submit" class="btn btn-success">Sauvegarder</button>
+        <label>Sigle</label>
+        @Html.TextBoxFor(m => m.Code, new { @class = "form-control" })
+
+        <label>Titre</label>
+        @Html.TextBoxFor(m => m.Title, new { @class = "form-control" })
+    </details>
+
+    <details open>
+        <summary>Inscriptions : @Models.NextSession.Caption</summary>
+
+        @Helper.SelectionLists(
+            "selectedStudentsId",
+            (System.Web.Mvc.SelectList)ViewBag.SelectedStudents,
+            (System.Web.Mvc.SelectList)ViewBag.Students
+        )
+    </details>
 }
 
-<br />
-@Html.ActionLink("Retour", "Index")
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $(".AddSelection").off("click").on("click", function () {
+                let parent = $(this).closest(".selectionsGrid");
+                parent.find(".UnselectedItems option:selected").each(function () {
+                    parent.find(".SelectedItems").append($(this));
+                });
+            });
+
+            $(".RemoveSelection").off("click").on("click", function () {
+                let parent = $(this).closest(".selectionsGrid");
+                parent.find(".SelectedItems option:selected").each(function () {
+                    parent.find(".UnselectedItems").append($(this));
+                });
+            });
+
+            $(".UnselectAll").off("click").on("click", function () {
+                let parent = $(this).closest(".selectionsGrid");
+                parent.find("option").prop("selected", false);
+            });
+
+            $("form").on("submit", function () {
+                $(".SelectedItems option").prop("selected", true);
+            });
+        });
+    </script>
+}
