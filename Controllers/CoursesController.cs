@@ -1,11 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using DAL;
+using Models;
+using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
-using DAL;
-using Models;
+using static Controllers.AccessControl;
 
 namespace LionelGroulx.Controllers
 {
+    [UserAccess(Access.View)]
     public class CoursesController : Controller
     {
         public ActionResult Index(string search)
@@ -65,7 +67,7 @@ namespace LionelGroulx.Controllers
 
             return View(course);
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult Create()
         {
             ViewBag.PageTitle = "Cours - Ajout";
@@ -83,7 +85,7 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult Edit(int id)
         {
             Course course = DB.Courses.Get(id);
@@ -163,7 +165,7 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Details", new { id = course.Id });
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult Delete(int id)
         {
             List<Registration> registrations = DB.Registrations.ToList()

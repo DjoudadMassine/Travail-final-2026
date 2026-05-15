@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using static Controllers.AccessControl;
 
 namespace LionelGroulx.Controllers
 {
+    [UserAccess(Access.View)]
     public class StudentsController : Controller
     {
         public ActionResult Index(string search)
@@ -68,7 +70,7 @@ namespace LionelGroulx.Controllers
 
             return View(student);
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult Create()
         {
             ViewBag.PageTitle = "Étudiant - Ajout";
@@ -88,7 +90,7 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Index");
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult Edit(int id)
         {
             Student student = DB.Students.Get(id);
@@ -127,7 +129,7 @@ namespace LionelGroulx.Controllers
 
             return RedirectToAction("Details", new { id = student.Id });
         }
-
+        [UserAccess(Access.Admin)]
         public ActionResult Delete(int id)
         {
             Student student = DB.Students.Get(id);

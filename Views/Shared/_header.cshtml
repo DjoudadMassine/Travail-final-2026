@@ -1,7 +1,4 @@
-﻿<!--
-    Cette vue partielle a pour mission de construire l'entête et les menus en fonction de l'action
--->
-@{
+﻿@{
     string controller = HttpContext.Current.Request.RequestContext.RouteData.Values["controller"].ToString().ToLower();
     string action = HttpContext.Current.Request.RequestContext.RouteData.Values["action"].ToString().ToLower();
 
@@ -9,112 +6,137 @@
         ? HttpContext.Current.Request.RequestContext.RouteData.Values["id"].ToString()
         : "";
 
-    bool search = Session["Search"] != null ? (bool)Session["Search"] : false;
-    string searchString = Session["SearchString"] != null ? (string)Session["SearchString"] : "";
-    bool SearchAscending = Session["SortAscending"] != null ? (bool)Session["SortAscending"] : false;
+    bool search = Session["Search"] != null
+        ? (bool)Session["Search"]
+        : false;
 
-    bool userConnected = Session["UserId"] != null;
-    bool userIsAdmin = Session["AccessLevel"] != null && Session["AccessLevel"].ToString() == "admin";
-    bool userCanWrite = !userConnected || Session["AccessLevel"] == null ||
-                        Session["AccessLevel"].ToString() == "admin" ||
-                        Session["AccessLevel"].ToString() == "super";
+    string searchString = Session["SearchString"] != null
+        ? (string)Session["SearchString"]
+        : "";
+
+    bool sortAscending = Session["SortAscending"] != null
+        ? (bool)Session["SortAscending"]
+        : false;
+
+    bool userConnected = Models.User.ConnectedUser != null;
+
+    bool userIsAdmin =
+        userConnected &&
+        Models.User.ConnectedUser.Access >= Models.Access.Admin;
 
     string index = "/" + controller;
-    string currentItemTitle = ViewBag.PageTitle != null ? ViewBag.PageTitle.ToString() : "";
 
-    string checkSortByTitle = "";
-    string checkSortByDate = "";
-    string checkSortByLikes = "";
-    string checkSortByComments = "";
+    string currentItemTitle =
+        ViewBag.PageTitle != null
+        ? ViewBag.PageTitle.ToString()
+        : "";
 
     string iconSortBy = "fa-solid fa-arrow-down-a-z";
     string iconSortByTitle = "Tri alphabétique";
 }
 
 <div class="section roundedBorder">
+
     <div class="headerMenu">
-        <img src="/WebApp.png" style="height:42px; margin-right:10px;" />
+
+        <img src="/WebApp.png"
+             style="height:42px; margin-right:10px;" />
 
         <div class="headerLeft">
-            <div class="pageTitle">@ViewBag.PageTitle</div>
+
+            <div class="pageTitle">
+                @ViewBag.PageTitle
+            </div>
 
             @if (action == "index" || action == "list")
             {
-                string studentsClass = controller == "students"
+                string studentsClass =
+                    controller == "students"
                     ? "menuLink menuLinkSelected"
                     : "menuLink menuLinkUnselected";
 
-                string coursesClass = controller == "courses"
+                string coursesClass =
+                    controller == "courses"
                     ? "menuLink menuLinkSelected"
                     : "menuLink menuLinkUnselected";
 
-                string teachersClass = controller == "teachers"
+                string teachersClass =
+                    controller == "teachers"
                     ? "menuLink menuLinkSelected"
                     : "menuLink menuLinkUnselected";
 
                 <div class="sectionTabs">
-                    <a href="/Students" class="@studentsClass">Étudiants</a>
-                    <a href="/Courses" class="@coursesClass">Cours</a>
-                    <a href="/Teachers" class="@teachersClass">Profs</a>
+
+                    <a href="/Students" class="@studentsClass">
+                        Étudiants
+                    </a>
+
+                    <a href="/Courses" class="@coursesClass">
+                        Cours
+                    </a>
+
+                    <a href="/Teachers" class="@teachersClass">
+                        Profs
+                    </a>
+
                 </div>
             }
+
         </div>
 
-        <!-- Direct action context command icons -->
         @switch (action)
         {
             case "login":
                 break;
 
-            case "subscribe":
-                <div id="mainMenuPanel" class="menu">
-                    <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.getElementById('submit').click()"></i>
-                    <a class="cmdIcon fa fa-square-xmark" title="Annuler" onclick="history.back()"></a>
-                </div>
-                break;
-
-            case "editprofil":
-                <div id="mainMenuPanel" class="menu">
-                    <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.getElementById('submit').click()"></i>
-                    <a class="cmdIcon fa fa-square-xmark" title="Annuler" onclick="history.back()"></a>
-                </div>
-                break;
-
             case "index":
             case "list":
+
                 <div id="mainMenuPanel" class="menu">
- 
-                    
 
-                    <div class="menu">
-
-                    @if (userCanWrite)
+                    @if (userIsAdmin)
                     {
-                        <a href="/@controller/Create" class="cmdIcon fa fa-circle-plus" title="Ajouter..."></a>
+                        <a href="/@controller/Create"
+                           class="cmdIcon fa fa-circle-plus"
+                           title="Ajouter...">
+                        </a>
                     }
 
-                    <a href="/@controller/ToggleSort" class="cmdIcon @iconSortBy" title="@iconSortByTitle"></a>
+                    <a href="/@controller/ToggleSort"
+                       class="cmdIcon @iconSortBy"
+                       title="@iconSortByTitle">
+                    </a>
 
-                    @if (SearchAscending)
+                    @if (sortAscending)
                     {
-                        <a href="/@controller/ToggleSort" class="cmdIcon fa fa-arrow-down-short-wide" title="Tri ascendant..."></a>
+                        <a href="/@controller/ToggleSort"
+                           class="cmdIcon fa fa-arrow-down-short-wide"
+                           title="Tri ascendant">
+                        </a>
                     }
                     else
                     {
-                        <a href="/@controller/ToggleSort" class="cmdIcon fa fa-arrow-up-wide-short" title="Tri descendant..."></a>
+                        <a href="/@controller/ToggleSort"
+                           class="cmdIcon fa fa-arrow-up-wide-short"
+                           title="Tri descendant">
+                        </a>
                     }
 
-                    <a href="/@controller/ToggleSearch" class="cmdIcon fa fa-search" title="Recherche..."></a>
+                    <a href="/@controller/ToggleSearch"
+                       class="cmdIcon fa fa-search"
+                       title="Recherche">
+                    </a>
 
-                    <!-- Dropdown menu -->
                     <div id="menu" class="dropdown ms-auto">
-                        <!-- Drop down menu acces icon -->
-                        <div data-bs-toggle="dropdown" aria-expanded="false">
+
+                        <div data-bs-toggle="dropdown">
                             <i class="cmdIcon fa fa-bars" title="Menu"></i>
                         </div>
 
-                        <!-- Drop down menu items -->
-                        <div class="dropdown-menu noselect" id="DDMenu" style="width:300px !important">
+                        <div class="dropdown-menu noselect"
+                             id="DDMenu"
+                             style="width:300px !important">
+
                             <div class="dropdown-item item-layout">
                                 <i class="menuIcon fa fa-user-graduate"></i>
                                 <a href="/Students">Étudiants</a>
@@ -136,127 +158,133 @@
                             {
                                 <div class="dropdown-item item-layout">
                                     <i class="menuIcon fa fa-address-card"></i>
-                                    <a href="/Accounts/EditProfil">Profil...</a>
+                                    <a href="/Accounts/EditProfil">
+                                        Profil
+                                    </a>
                                 </div>
 
                                 <div class="dropdown-item item-layout">
                                     <i class="menuIcon fa fa-sign-out"></i>
-                                    <a href="/Accounts/Logout">Déconnexion...</a>
+                                    <a href="/Accounts/Logout">
+                                        Déconnexion
+                                    </a>
                                 </div>
                             }
                             else
                             {
                                 <div class="dropdown-item item-layout">
                                     <i class="menuIcon fa fa-sign-in"></i>
-                                    <a href="/Accounts/Login">Connexion...</a>
-                                </div>
-                            }
-
-                            @if (userIsAdmin)
-                            {
-                                <div class="dropdown-divider"></div>
-
-                                <div class="dropdown-item item-layout">
-                                    <i class="menuIcon fa fa-users"></i>
-                                    <a href="/Accounts/ManageUsers">
-                                        Gestion des usagers...
-                                    </a>
-                                </div>
-
-                                <div class="dropdown-item item-layout">
-                                    <i class="menuIcon fa fa-calendar-days"></i>
-                                    <a href="/Accounts/LoginsJournal">
-                                        Historique de connexions...
+                                    <a href="/Accounts/Login">
+                                        Connexion
                                     </a>
                                 </div>
                             }
 
-                            <div class="dropdown-divider"></div>
-
-                            <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa @checkSortByTitle"></i>
-                                <a href="/@controller/SetSortBy?sortBy=Title">Trier par titre/nom</a>
-                            </div>
-
-                            <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa @checkSortByDate"></i>
-                                <a href="/@controller/SetSortBy?sortBy=Date">Trier par date/session</a>
-                            </div>
-
-                            <div class="dropdown-divider"></div>
-
-                            <div class="dropdown-item item-layout">
-                                <i class="menuIcon fa fa-info-circle"></i>
-                                <a href="/@controller/About">À propos...</a>
-                            </div>
                         </div>
                     </div>
+
                 </div>
-                    </div>
-                    
+
                 break;
 
             case "details":
+
                 <div id="mainMenuPanel" class="menu">
-                    
-                    @if (userCanWrite)
+
+                    @if (userIsAdmin)
                     {
-                        <a href="/@controller/Edit/@id" class="cmdIcon fa fa-pen-to-square" title="Modifier..."></a>
+                        <a href="/@controller/Edit/@id"
+                           class="cmdIcon fa fa-pen-to-square"
+                           title="Modifier">
+                        </a>
+
                         <i class="cmdIcon fa fa-trash-can"
                            title="Effacer"
-                           onclick="bootbox.confirm(`<b style=color:red>Effacer : </b><h3>@currentItemTitle?</h3>`, function(result){ if (result) window.location = '/@controller/Delete/@id'; })">
+                           onclick="bootbox.confirm(
+                           `<b style=color:red>Effacer :</b><h3>@currentItemTitle ?</h3>`,
+                           function(result)
+                           {
+                               if (result)
+                                   window.location='/@controller/Delete/@id';
+                           })">
                         </i>
                     }
 
-                    <a href="/@controller/Index" class="cmdIcon fa fa-square-xmark" title="retour"></a>
+                    <a href="/@controller/Index"
+                       class="cmdIcon fa fa-square-xmark"
+                       title="Retour">
+                    </a>
+
                 </div>
+
                 break;
 
             case "create":
-                if (userCanWrite)
+
+                if (userIsAdmin)
                 {
                     <div id="mainMenuPanel" class="menu">
-                        <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.querySelector('form').submit()"></i>
-                        <a href="@index" class="cmdIcon fa fa-square-xmark" title="Annuler"></a>
+
+                        <i class="cmdIcon submitCmd fa fa-circle-check"
+                           title="Soumettre"
+                           onclick="document.querySelector('form').submit()">
+                        </i>
+
+                        <a href="@index"
+                           class="cmdIcon fa fa-square-xmark"
+                           title="Annuler">
+                        </a>
+
                     </div>
                 }
+
                 break;
 
             case "edit":
-    <div id="mainMenuPanel" class="menu">
-        <i class="cmdIcon submitCmd fa fa-circle-check" title="Soumettre" onclick="document.querySelector('form').submit()"></i>
-        @if (controller == "nextsession")
-        {
-            <a href="/Students"
-               class="cmdIcon fa fa-square-xmark"
-               title="Annuler">
-            </a>
-        }
-        else
-        {
-            <a href="/@controller/Details/@id"
-               class="cmdIcon fa fa-square-xmark"
-               title="Annuler">
-            </a>
-        }
-    </div>
-                break;
 
-            case "loginsjournal":
-            case "eventsjournal":
-            case "manageusers":
-            case "about":
-                <div id="mainMenuPanel" class="menu">
-                    <a href="@index" class="cmdIcon fa fa-square-xmark" title="Retour"></a>
-                </div>
+                if (userIsAdmin)
+                {
+                    <div id="mainMenuPanel" class="menu">
+
+                        <i class="cmdIcon submitCmd fa fa-circle-check"
+                           title="Soumettre"
+                           onclick="document.querySelector('form').submit()">
+                        </i>
+
+                        if (controller == "nextsession")
+                        {
+                        <a href="/Students"
+                           class="cmdIcon fa fa-square-xmark"
+                           title="Annuler">
+                        </a>
+                        }
+                        else
+                        {
+                        <a href="/@controller/Details/@id"
+                           class="cmdIcon fa fa-square-xmark"
+                           title="Annuler">
+                        </a>
+                        }
+
+                    </div>
+                }
+
                 break;
         }
+
     </div>
+
 </div>
 
 @if (search && (action == "index" || action == "list"))
 {
     <div class="searchBar">
-        <input type="search" id="searchInput" class="section roundedBorder searchBarItem" value="@searchString" placeholder="Recherche...">
+
+        <input type="search"
+               id="searchInput"
+               class="section roundedBorder searchBarItem"
+               value="@searchString"
+               placeholder="Recherche...">
+
     </div>
 }
