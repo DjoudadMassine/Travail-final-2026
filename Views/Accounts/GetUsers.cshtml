@@ -19,20 +19,43 @@
             <td>@Helper.Checked(user.Verified)</td>
             <td>@Helper.Checked(user.Blocked)</td>
             <td>
-                <i class="cmdIcon fa fa-eye setUserAccessCmd"
-                   userId="@user.Id"
-                   access="1"
-                   title="Donner accès lecture"></i>
+                @if (user.Access != Models.Access.View)
+                {
+                    <i class="cmdIcon fa fa-eye setUserAccessCmd"
+                       userId="@user.Id"
+                       access="1"
+                       title="Remettre en lecture seule"></i>
+                }
 
-                <i class="cmdIcon fa fa-pen setUserAccessCmd"
-                   userId="@user.Id"
-                   access="2"
-                   title="Donner accès écriture"></i>
+                @if (user.Access != Models.Access.Write)
+                {
+                    <i class="cmdIcon fa fa-pen setUserAccessCmd"
+                       userId="@user.Id"
+                       access="2"
+                       title="Donner droits d’écriture"></i>
+                }
+                else
+                {
+                    <i class="cmdIcon fa fa-pen-slash setUserAccessCmd"
+                       userId="@user.Id"
+                       access="1"
+                       title="Enlever droits d’écriture"></i>
+                }
 
-                <i class="cmdIcon fa fa-crown setUserAccessCmd"
-                   userId="@user.Id"
-                   access="3"
-                   title="Donner accès admin"></i>
+                @if (user.Access != Models.Access.Admin)
+                {
+                    <i class="cmdIcon fa fa-crown setUserAccessCmd"
+                       userId="@user.Id"
+                       access="3"
+                       title="Donner droits admin"></i>
+                }
+                else
+                {
+                    <i class="cmdIcon fa fa-user-minus setUserAccessCmd"
+                       userId="@user.Id"
+                       access="2"
+                       title="Enlever droits admin"></i>
+                }
 
                 <i class="cmdIcon fa fa-ban blockCmd"
                    userId="@user.Id"
